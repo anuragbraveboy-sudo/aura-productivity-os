@@ -1613,6 +1613,50 @@ An overview of the **mitosis cell cycle** phase transitions in biological divisi
     });
   }
 
+  function syncWithLaptop() {
+    AuraSounds.click();
+    const ip = AuraBridge.getIP();
+    if (!ip) {
+      showToast("Please configure your Laptop Local IP first.");
+      toggleSettingsDrawer(true);
+      return;
+    }
+
+    showToast("Connecting to Laptop Bridge...");
+    AuraBridge.checkHealth().then(status => {
+      if (!status.online) {
+        showToast("⚠️ Laptop Bridge is offline. Check if server.py is running on port 8765.");
+        updateBridgeStatusBadge();
+        return;
+      }
+
+      AuraDB.getAllLectures().then(lectures => {
+        if (lectures.length === 0) {
+          showToast("No lectures in database to sync.");
+          return;
+        }
+
+        AuraBridge.syncLectures(lectures)
+          .then(res => {
+            AuraSounds.success();
+            showToast(`🔄 Backup Complete! Synced ${lectures.length} lectures to laptop.`);
+            const promises = lectures.map(l => {
+              l.synced = true;
+              return AuraDB.saveLecture(l);
+            });
+            Promise.all(promises).then(() => {
+              refreshStudy();
+              updateBridgeStatusBadge();
+            });
+          })
+          .catch(err => {
+            console.error(err);
+            showToast("Sync failed. Check laptop console logs.");
+          });
+      });
+    });
+  }
+
   // Update status dot/text for laptop bridge connection
   function updateBridgeStatusBadge() {
     const badge = document.getElementById('btn-bridge-status');
@@ -1788,6 +1832,7 @@ An overview of the **mitosis cell cycle** phase transitions in biological divisi
     saveAPIKeys,
     clearAPIKeys,
     saveBridgeIP,
+    syncWithLaptop,
     setTheme,
     showToast,
     addXP,
