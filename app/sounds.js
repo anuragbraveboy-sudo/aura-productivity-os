@@ -5,8 +5,14 @@
 class AuraSounds {
   constructor() {
     this.ctx = null;
-    this.muted = localStorage.getItem('aura_muted') === 'true';
-    this.keyboardFXEnabled = localStorage.getItem('aura_keyboard_fx') === 'true';
+    let localMuted = false;
+    let localKb = false;
+    try {
+      localMuted = localStorage.getItem('aura_muted') === 'true';
+      localKb = localStorage.getItem('aura_keyboard_fx') === 'true';
+    } catch(e) {}
+    this.muted = localMuted;
+    this.keyboardFXEnabled = localKb;
     
     this.ambientSource = null;
     this.ambientGain = null;
@@ -17,7 +23,7 @@ class AuraSounds {
     const unlock = () => {
       this.initContext();
       if (this.ctx && this.ctx.state === 'suspended') {
-        this.ctx.resume();
+        try { this.ctx.resume(); } catch(e) {}
       }
       window.removeEventListener('click', unlock);
       window.removeEventListener('touchstart', unlock);
@@ -26,7 +32,10 @@ class AuraSounds {
     window.addEventListener('touchstart', unlock);
 
     // Auto boot ambient noise if set
-    const savedAmbient = localStorage.getItem('aura_ambient_noise') || 'none';
+    let savedAmbient = 'none';
+    try {
+      savedAmbient = localStorage.getItem('aura_ambient_noise') || 'none';
+    } catch(e) {}
     if (savedAmbient !== 'none') {
       window.addEventListener('click', () => {
         if (!this.ambientSource) {
@@ -78,7 +87,10 @@ class AuraSounds {
     this.initContext();
     if (!this.ctx) return;
 
-    const type = localStorage.getItem('aura_keyboard_type') || 'thock';
+    let type = 'thock';
+    try {
+      type = localStorage.getItem('aura_keyboard_type') || 'thock';
+    } catch(e) {}
     const now = this.ctx.currentTime;
     
     if (type === 'thock') {
@@ -180,7 +192,10 @@ class AuraSounds {
     this.ambientGain = this.ctx.createGain();
     this.ambientGain.connect(this.ctx.destination);
     
-    const vol = parseFloat(localStorage.getItem('aura_ambient_volume') || '0.5');
+    let vol = 0.5;
+    try {
+      vol = parseFloat(localStorage.getItem('aura_ambient_volume') || '0.5');
+    } catch(e) {}
     this.ambientGain.gain.setValueAtTime(vol * 0.15, this.ctx.currentTime);
     
     if (type === 'brown' || type === 'white') {
@@ -262,7 +277,9 @@ class AuraSounds {
   }
 
   setAmbientVolume(vol) {
-    localStorage.setItem('aura_ambient_volume', vol);
+    try {
+      localStorage.setItem('aura_ambient_volume', vol);
+    } catch(e) {}
     if (this.ambientGain) {
       this.ambientGain.gain.setValueAtTime(vol * 0.15, this.ctx.currentTime);
     }
@@ -355,13 +372,24 @@ class AuraSounds {
 
   toggleMute() {
     this.muted = !this.muted;
-    localStorage.setItem('aura_muted', this.muted);
+    try {
+      localStorage.setItem('aura_muted', this.muted);
+    } catch(e) {}
     return this.muted;
   }
 }
 
-// Global Audio Engine Instantiation
-window.AuraSounds = new AuraSounds();
+// Global Audio Engine Instantiation (Resilient Fallback)
+try {
+  window.AuraSounds = new AuraSounds();
+} catch (e) {
+  console.warn("Audio Context or LocalStorage blocked. Running silent fallback:", e);
+  window.AuraSounds = {
+    playTap() {}, playKeystroke() {}, playSuccess() {}, playPomodoroComplete() {}, playLevelUp() {},
+    click() {}, success() {}, pomo() {}, levelup() {},
+    toggleMute() { return true; }, stopAmbient() {}, setAmbientVolume() {}, initAmbientSource() {}
+  };
+}
 
 // Dynamic sound interceptors
 document.addEventListener('click', (e) => {
