@@ -580,29 +580,84 @@
         </div>
       </div>
 
-      <!-- AI Provider API Credentials -->
-      <div class="section-label">AI Integration Provider</div>
+      <!-- AUDIO & SOUNDSCAPES Section -->
+      <div class="section-label">🔊 Audio & Soundscapes</div>
       <div class="ai-provider-settings-card">
-        <select id="select-ai-provider" class="drawer-dropdown-field" onchange="AuraApp.toggleAIKeyFields()">
-          <option value="gemini" selected>Google Gemini API</option>
-          <option value="claude">Anthropic Claude API</option>
-        </select>
+        <div class="form-group" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <label for="sound-fx-toggle" style="font-size:12px; font-weight:600;">ON-DEVICE INTERFACE SOUNDS</label>
+          <input type="checkbox" id="sound-fx-toggle" onchange="AuraApp.toggleStudioSoundFX()" style="width:16px; height:16px;">
+        </div>
+        
+        <div class="form-group" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <label for="keyboard-fx-toggle" style="font-size:12px; font-weight:600;">MECHANICAL KEYBOARD FEEDBACK</label>
+          <input type="checkbox" id="keyboard-fx-toggle" onchange="AuraApp.toggleStudioKeyboardFX()" style="width:16px; height:16px;">
+        </div>
+        
+        <div class="form-group" style="margin-bottom:8px;">
+          <label for="keyboard-type-select" style="display:block; font-size:11px; color:var(--text-muted); margin-bottom:4px; font-weight:600;">SWITCH TYPE PROFILE</label>
+          <select id="keyboard-type-select" class="drawer-dropdown-field" onchange="AuraApp.updateStudioKeyboardType()">
+            <option value="thock">Lubricated Linear (Thock)</option>
+            <option value="clicky">Cherry MX Blue (Clicky)</option>
+            <option value="pop">Silenced Tactile (Bubble Pop)</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom:8px;">
+          <label for="ambient-noise-select" style="display:block; font-size:11px; color:var(--text-muted); margin-bottom:4px; font-weight:600;">FOCUS BACKGROUND NOISE</label>
+          <select id="ambient-noise-select" class="drawer-dropdown-field" onchange="AuraApp.updateStudioAmbientNoise()">
+            <option value="none">None</option>
+            <option value="brown">Synthetic Brown Noise</option>
+            <option value="white">Synthetic White Noise</option>
+            <option value="lofi">Generative Ambient Swells</option>
+            <option value="rain">Generative Forest Rain</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <div class="slider-label-row" style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-bottom:4px; font-weight:600;">
+            <label for="ambient-volume-slider">BACKGROUND VOLUME</label>
+            <span class="slider-val" id="ambient-volume-val">50%</span>
+          </div>
+          <input type="range" id="ambient-volume-slider" min="0" max="1.0" step="0.05" value="0.5" oninput="AuraApp.updateStudioAmbientVolume()" style="width:100%; accent-color:var(--accent);">
+        </div>
+      </div>
+
+      <!-- AI ASSISTANT CONFIGURATION Section -->
+      <div class="section-label">🤖 AI Assistant Configuration</div>
+      <div class="ai-provider-settings-card">
+        <div class="form-group" style="margin-bottom:8px;">
+          <label for="ai-persona-select" style="display:block; font-size:11px; color:var(--text-muted); margin-bottom:4px; font-weight:600;">PERSONA & TONE</label>
+          <select id="ai-persona-select" class="drawer-dropdown-field" onchange="AuraApp.updateStudioAiPersona()">
+            <option value="coach" selected>Encouraging Study Coach</option>
+            <option value="mentor">Professor / Academic Mentor</option>
+            <option value="friend">Casual Study Partner</option>
+            <option value="researcher">Fact-focused Research Assistant</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom:8px;">
+          <label for="select-ai-provider" style="display:block; font-size:11px; color:var(--text-muted); margin-bottom:4px; font-weight:600;">AI MODEL PROVIDER</label>
+          <select id="select-ai-provider" class="drawer-dropdown-field" onchange="AuraApp.toggleAIKeyFields()">
+            <option value="gemini" selected>Google Gemini (Default)</option>
+            <option value="claude">Anthropic Claude</option>
+          </select>
+        </div>
         
         <div id="field-gemini-key-wrapper" class="api-key-input-wrapper">
-          <label for="input-gemini-key" class="api-key-field-label">Gemini API Key</label>
-          <input id="input-gemini-key" type="password" class="input-form-field" placeholder="AIStudio Key (AIzaSy...)">
-          <a id="link-gemini-key" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" class="api-helper-link">Get a free Gemini API key ➔</a>
+          <label for="input-gemini-key" class="api-key-field-label">GEMINI API KEY</label>
+          <input id="input-gemini-key" type="password" class="input-form-field" placeholder="AIzaSy...">
+          <a id="link-gemini-key" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" class="api-helper-link">Get your free key at aistudio.google.com</a>
         </div>
 
         <div id="field-claude-key-wrapper" class="api-key-input-wrapper" style="display: none;">
-          <label for="input-claude-key" class="api-key-field-label">Claude API Key</label>
-          <input id="input-claude-key" type="password" class="input-form-field" placeholder="Anthropic Key (sk-ant-...)">
+          <label for="input-claude-key" class="api-key-field-label">CLAUDE API KEY</label>
+          <input id="input-claude-key" type="password" class="input-form-field" placeholder="sk-ant-...">
           <a id="link-claude-key" href="https://console.anthropic.com/" target="_blank" rel="noopener" class="api-helper-link">Get Anthropic Claude key ➔</a>
         </div>
 
-        <div class="api-key-actions-row">
-          <button id="btn-save-keys" class="btn-primary-small" onclick="AuraApp.saveAPIKeys()">Save Keys</button>
-          <button id="btn-clear-keys" class="btn-ghost-small" style="color: var(--danger);" onclick="AuraApp.clearAPIKeys()">Clear Keys</button>
+        <div class="api-key-actions-row" style="margin-top:8px;">
+          <button id="btn-save-keys" class="btn-primary-small" style="flex: 1;" onclick="AuraApp.saveAPIKeys()">Save Keys</button>
+          <button id="btn-clear-keys" class="btn-ghost-small" style="color: var(--danger); flex: 1;" onclick="AuraApp.clearAPIKeys()">Clear Keys</button>
         </div>
       </div>
 
@@ -611,7 +666,7 @@
       <div class="bridge-config-card">
         <div class="form-fields-grid">
           <label for="input-bridge-ip">Laptop Local IP</label>
-          <input id="input-bridge-ip" type="text" class="input-form-field" placeholder="e.g. 192.168.1.9">
+          <input id="input-bridge-ip" type="text" class="input-form-field" placeholder="e.g. 10.16.24.182">
         </div>
         <button id="btn-save-bridge-ip" class="btn-secondary" style="width: 100%; margin-top: 12px;" onclick="AuraApp.saveBridgeIP()">Connect Laptop Bridge</button>
       </div>
