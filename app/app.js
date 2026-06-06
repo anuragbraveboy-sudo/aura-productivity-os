@@ -96,6 +96,35 @@ const AuraApp = (() => {
         updateBridgeStatusBadge();
       }
     });
+    
+    // Load sounds and keyboard config
+    const soundFx = localStorage.getItem('aura_muted') !== 'true';
+    const soundFxBox = document.getElementById('sound-fx-toggle');
+    if (soundFxBox) soundFxBox.checked = soundFx;
+    
+    const kbFx = localStorage.getItem('aura_keyboard_fx') === 'true';
+    const kbFxBox = document.getElementById('keyboard-fx-toggle');
+    if (kbFxBox) kbFxBox.checked = kbFx;
+    if (window.AuraSounds) window.AuraSounds.keyboardFXEnabled = kbFx;
+    
+    const kbType = localStorage.getItem('aura_keyboard_type') || 'thock';
+    const kbTypeSelect = document.getElementById('keyboard-type-select');
+    if (kbTypeSelect) kbTypeSelect.value = kbType;
+    
+    const ambientNoise = localStorage.getItem('aura_ambient_noise') || 'none';
+    const ambientSelect = document.getElementById('ambient-noise-select');
+    if (ambientSelect) ambientSelect.value = ambientNoise;
+    
+    const ambientVol = localStorage.getItem('aura_ambient_volume') || '0.5';
+    const ambientVolSlider = document.getElementById('ambient-volume-slider');
+    const ambientVolLabel = document.getElementById('ambient-volume-val');
+    if (ambientVolSlider) ambientVolSlider.value = ambientVol;
+    if (ambientVolLabel) ambientVolLabel.textContent = `${Math.round(ambientVol * 100)}%`;
+    
+    const aiPersona = localStorage.getItem('aura_ai_persona') || 'coach';
+    const personaSelect = document.getElementById('ai-persona-select');
+    if (personaSelect) personaSelect.value = aiPersona;
+
     // Load chat history
     state.study.chatHistory = JSON.parse(localStorage.getItem('aura_chat_history') || '[]');
   }
@@ -1668,6 +1697,63 @@ An overview of the **mitosis cell cycle** phase transitions in biological divisi
       .replace(/'/g, "&#039;");
   }
 
+  // Audio & Soundscape configuration handlers
+  function toggleStudioSoundFX() {
+    const box = document.getElementById('sound-fx-toggle');
+    if (!box) return;
+    const isMuted = AuraSounds.toggleMute();
+    box.checked = !isMuted;
+    showToast(isMuted ? "Interface sounds muted." : "Interface sounds enabled.");
+  }
+
+  function toggleStudioKeyboardFX() {
+    const box = document.getElementById('keyboard-fx-toggle');
+    if (!box) return;
+    const enabled = box.checked;
+    localStorage.setItem('aura_keyboard_fx', enabled ? 'true' : 'false');
+    AuraSounds.keyboardFXEnabled = enabled;
+    showToast(enabled ? "Keyboard thock sounds enabled." : "Keyboard thock sounds muted.");
+  }
+
+  function updateStudioKeyboardType() {
+    const select = document.getElementById('keyboard-type-select');
+    if (!select) return;
+    const type = select.value;
+    localStorage.setItem('aura_keyboard_type', type);
+    showToast(`Keystroke profile set to: ${type}`);
+  }
+
+  function updateStudioAmbientNoise() {
+    const select = document.getElementById('ambient-noise-select');
+    if (!select) return;
+    const type = select.value;
+    localStorage.setItem('aura_ambient_noise', type);
+    if (type === 'none') {
+      AuraSounds.stopAmbient();
+      showToast("Background soundscapes stopped.");
+    } else {
+      AuraSounds.initAmbientSource(type);
+      showToast(`Soundscape active: ${type}`);
+    }
+  }
+
+  function updateStudioAmbientVolume() {
+    const slider = document.getElementById('ambient-volume-slider');
+    const label = document.getElementById('ambient-volume-val');
+    if (!slider || !label) return;
+    const vol = parseFloat(slider.value);
+    AuraSounds.setAmbientVolume(vol);
+    label.textContent = `${Math.round(vol * 100)}%`;
+  }
+
+  function updateStudioAiPersona() {
+    const select = document.getElementById('ai-persona-select');
+    if (!select) return;
+    const persona = select.value;
+    localStorage.setItem('aura_ai_persona', persona);
+    showToast(`AI persona adjusted: ${persona}`);
+  }
+
   return {
     init,
     switchScreen,
@@ -1704,7 +1790,13 @@ An overview of the **mitosis cell cycle** phase transitions in biological divisi
     saveBridgeIP,
     setTheme,
     showToast,
-    addXP
+    addXP,
+    toggleStudioSoundFX,
+    toggleStudioKeyboardFX,
+    updateStudioKeyboardType,
+    updateStudioAmbientNoise,
+    updateStudioAmbientVolume,
+    updateStudioAiPersona
   };
 })();
 
