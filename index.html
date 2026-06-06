@@ -75,8 +75,8 @@
       </div>
 
       <div class="landing-actions">
-        <button class="btn-primary large-action" onclick="enterApp(false)">✨ Launch Workspace</button>
-        <button class="btn-secondary large-action" onclick="enterApp(true)">🚀 Hackathon Demo Mode</button>
+        <button class="btn-primary large-action" id="btn-launch-workspace" onclick="enterApp(false)">✨ Launch Workspace</button>
+        <button class="btn-secondary large-action" id="btn-hackathon-demo" onclick="enterApp(true)">🚀 Hackathon Demo Mode</button>
       </div>
       <p class="landing-demo-hint">💡 **Demo Mode** seeds the workspace instantly with sample lectures, calendars, streaks, and RPG stats.</p>
     </div>
@@ -101,7 +101,7 @@
       <div class="command-center premium-glass">
         <div class="cc-header">
           <div>
-            <h1 class="screen-title gradient-greeting" id="home-greeting">Good evening Krish 🌌</h1>
+            <h2 class="screen-title gradient-greeting" id="home-greeting">Good evening Krish 🌌</h2>
             <p class="screen-subtitle" id="home-subtitle" style="margin-bottom:0;">Ready for a deep study session?</p>
           </div>
           <div class="cc-profile-badge">
@@ -139,7 +139,7 @@
             <div class="theme-circle theme-midnight" onclick="setTheme('midnight')" title="Midnight Blue">🌑</div>
           </div>
         </div>
-        <button class="btn-icon settings-btn" onclick="openSettings()" title="Settings">
+        <button class="btn-icon settings-btn" id="btn-settings-toggle" onclick="openSettings()" title="Settings">
           <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
       </div>
@@ -176,21 +176,21 @@
           </div>
 
           <div class="pomo-controls">
-            <button class="btn-icon" onclick="pomodoroAction('reset')" title="Reset">↺</button>
+            <button class="btn-icon" id="btn-pomo-reset" onclick="pomodoroAction('reset')" title="Reset">↺</button>
             <button class="pomo-main-btn" id="pomo-btn" onclick="pomodoroAction('toggle')">▶</button>
-            <button class="btn-icon" onclick="pomodoroAction('skip')" title="Skip">⏭</button>
+            <button class="btn-icon" id="btn-pomo-skip" onclick="pomodoroAction('skip')" title="Skip">⏭</button>
           </div>
           <div class="pomo-modes">
-            <button class="pomo-mode active" data-mins="25" onclick="setPomoMode(25,'Focus',this)">25 min</button>
-            <button class="pomo-mode" data-mins="5" onclick="setPomoMode(5,'Short Break',this)">5 min</button>
-            <button class="pomo-mode" data-mins="15" onclick="setPomoMode(15,'Long Break',this)">15 min</button>
-            <button class="pomo-mode" data-mins="50" onclick="setPomoMode(50,'Deep Work',this)">50 min</button>
+            <button class="pomo-mode active" id="btn-pomo-mode-25" data-mins="25" onclick="setPomoMode(25,'Focus',this)">25 min</button>
+            <button class="pomo-mode" id="btn-pomo-mode-5" data-mins="5" onclick="setPomoMode(5,'Short Break',this)">5 min</button>
+            <button class="pomo-mode" id="btn-pomo-mode-15" data-mins="15" onclick="setPomoMode(15,'Long Break',this)">15 min</button>
+            <button class="pomo-mode" id="btn-pomo-mode-50" data-mins="50" onclick="setPomoMode(50,'Deep Work',this)">50 min</button>
           </div>
           <div class="pomo-custom">
-            <button class="pomo-mode" onclick="showCustomTimer()">⏱️ Custom</button>
+            <button class="pomo-mode" id="btn-pomo-custom-toggle" onclick="showCustomTimer()">⏱️ Custom</button>
             <div class="pomo-custom-input" id="pomo-custom-input" style="display:none;">
               <input type="number" id="custom-mins" min="1" max="120" placeholder="Mins" />
-              <button class="btn-primary" style="padding:6px 16px;font-size:12px;" onclick="applyCustomTimer()">Set</button>
+              <button class="btn-primary" id="btn-pomo-custom-set" style="padding:6px 16px;font-size:12px;" onclick="applyCustomTimer()">Set</button>
             </div>
           </div>
           <div class="pomo-stats">
@@ -292,7 +292,7 @@
          ═══════════════════════════════════════ -->
     <section id="screen-record" class="screen">
 
-      <h1 class="screen-title">Record Lecture</h1>
+      <h2 class="screen-title">Record Lecture</h2>
       <p class="screen-subtitle">Tap to start capturing speech in real-time</p>
 
       <div class="record-center">
@@ -383,7 +383,7 @@
             <p style="font-size:13px;color:var(--muted);margin-bottom:10px;">Paste a YouTube link to generate AI notes from the video</p>
             <div style="display:flex;gap:8px;">
               <input type="url" id="yt-url-input" class="modal-input" placeholder="https://youtube.com/watch?v=..." style="flex:1;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:13px;" />
-              <button class="btn-primary" style="padding:10px 16px;font-size:13px;white-space:nowrap;" onclick="generateYTNotes()">📝 Generate</button>
+              <button class="btn-primary" id="btn-yt-generate" style="padding:10px 16px;font-size:13px;white-space:nowrap;" onclick="generateYTNotes()">📝 Generate</button>
             </div>
             <div id="yt-result" style="margin-top:12px;"></div>
           </div>
@@ -393,8 +393,8 @@
         <div class="post-record" id="post-record">
           <input type="text" class="lecture-title-input" id="lecture-title-input" placeholder="Lecture title..." />
           <div class="post-record-actions">
-            <button class="btn-secondary" onclick="saveLectureFromRecording()">💾 Save Only</button>
-            <button class="btn-primary" onclick="summarizeAndSave()">✨ Summarize & Save</button>
+            <button class="btn-secondary" id="btn-record-save-only" onclick="saveLectureFromRecording()">💾 Save Only</button>
+            <button class="btn-primary" id="btn-record-summarize-save" onclick="summarizeAndSave()">✨ Summarize & Save</button>
           </div>
         </div>
 
@@ -407,7 +407,7 @@
          ═══════════════════════════════════════ -->
     <section id="screen-study" class="screen">
 
-      <h1 class="screen-title">Study Hub</h1>
+      <h2 class="screen-title">Study Hub</h2>
       <p class="screen-subtitle">Review, revise, and ace your exams</p>
 
       <!-- Lecture Detail View (hidden by default) -->
@@ -462,9 +462,9 @@
         <div id="panel-flashcards" class="study-panel">
           <div class="flashcard-deck" id="flashcard-deck"></div>
           <div class="flashcard-nav">
-            <button class="btn-icon" onclick="prevFlashcard()">◀</button>
+            <button class="btn-icon" id="btn-flashcard-prev" onclick="prevFlashcard()">◀</button>
             <span class="flashcard-counter" id="flashcard-counter">0 / 0</span>
-            <button class="btn-icon" onclick="nextFlashcard()">▶</button>
+            <button class="btn-icon" id="btn-flashcard-next" onclick="nextFlashcard()">▶</button>
           </div>
         </div>
 
@@ -472,7 +472,7 @@
         <div id="panel-chat" class="study-panel">
           <div class="chat-header">
             <span class="chat-title">💬 AI Study Coach</span>
-            <button class="clear-chat-btn" onclick="clearChatHistory()">🗑 Clear Chat</button>
+            <button class="clear-chat-btn" id="btn-chat-clear" onclick="clearChatHistory()">🗑 Clear Chat</button>
           </div>
           <div class="chat-container" id="chat-messages">
             <div class="chat-bubble ai">
@@ -486,9 +486,9 @@
           <div class="coach-triggers glass-card">
             <div class="coach-trigger-title">⚡ Instant Study Workflows</div>
             <div class="coach-trigger-grid">
-              <button class="btn-secondary coach-btn" onclick="triggerCoachAction('flashcards')">🃏 Make Flashcards</button>
-              <button class="btn-secondary coach-btn" onclick="triggerCoachAction('quiz')">📝 Create a Quiz</button>
-              <button class="btn-secondary coach-btn" onclick="triggerCoachAction('schedule')">📅 Schedule Revision</button>
+              <button class="btn-secondary coach-btn" id="btn-coach-flashcards" onclick="triggerCoachAction('flashcards')">🃏 Make Flashcards</button>
+              <button class="btn-secondary coach-btn" id="btn-coach-quiz" onclick="triggerCoachAction('quiz')">📝 Create a Quiz</button>
+              <button class="btn-secondary coach-btn" id="btn-coach-schedule" onclick="triggerCoachAction('schedule')">📅 Schedule Revision</button>
             </div>
           </div>
         </div>
@@ -501,7 +501,7 @@
          ═══════════════════════════════════════ -->
     <section id="screen-calendar" class="screen">
 
-      <h1 class="screen-title">Calendar</h1>
+      <h2 class="screen-title">Calendar</h2>
       <p class="screen-subtitle">Smart study schedule & deadlines</p>
 
       <!-- Full Month Grid -->
@@ -512,8 +512,8 @@
 
       <!-- Action Buttons -->
       <div class="cal-actions" style="margin-top:12px;">
-        <button class="btn-primary" onclick="toggleCalForm('deadline')">📋 Add Deadline</button>
-        <button class="btn-secondary" onclick="toggleCalForm('session')">📝 Add Study Session</button>
+        <button class="btn-primary" id="btn-cal-add-deadline-toggle" onclick="toggleCalForm('deadline')">📋 Add Deadline</button>
+        <button class="btn-secondary" id="btn-cal-add-session-toggle" onclick="toggleCalForm('session')">📝 Add Study Session</button>
       </div>
 
       <!-- Add Deadline Form (inline, hidden) -->
@@ -528,8 +528,8 @@
           <option value="high">High Priority</option>
         </select>
         <div class="cal-actions">
-          <button class="btn-primary" onclick="handleAddDeadlineInline()">✅ Add Deadline</button>
-          <button class="btn-secondary" onclick="toggleCalForm('deadline')">Cancel</button>
+          <button class="btn-primary" id="btn-cal-add-deadline-submit" onclick="handleAddDeadlineInline()">✅ Add Deadline</button>
+          <button class="btn-secondary" id="btn-cal-add-deadline-cancel" onclick="toggleCalForm('deadline')">Cancel</button>
         </div>
       </div>
 
@@ -540,8 +540,8 @@
         <input type="time" id="ss-time-input" />
         <input type="number" id="ss-duration-input" placeholder="Duration (minutes)" min="5" max="480" value="60" />
         <div class="cal-actions">
-          <button class="btn-primary" onclick="handleAddSessionInline()">✅ Add Session</button>
-          <button class="btn-secondary" onclick="toggleCalForm('session')">Cancel</button>
+          <button class="btn-primary" id="btn-cal-add-session-submit" onclick="handleAddSessionInline()">✅ Add Session</button>
+          <button class="btn-secondary" id="btn-cal-add-session-cancel" onclick="toggleCalForm('session')">Cancel</button>
         </div>
       </div>
 
@@ -609,7 +609,7 @@
         <span style="font-size:20px;">🎨</span>
         <h3 style="margin:0;font-size:18px;font-weight:700;">AURA Studio</h3>
       </div>
-      <button class="btn-close-studio" onclick="toggleStudio(false)" style="background:none;border:none;color:var(--text);font-size:18px;cursor:pointer;">✕</button>
+      <button class="btn-close-studio" id="btn-studio-close" onclick="toggleStudio(false)" style="background:none;border:none;color:var(--text);font-size:18px;cursor:pointer;">✕</button>
     </div>
     <div class="studio-drawer-body" style="flex:1;overflow-y:auto;padding:16px;box-sizing:border-box;">
       
@@ -618,12 +618,12 @@
         <div class="studio-section-label" style="font-size:12px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;border-bottom:1px solid var(--border);padding-bottom:4px;">⚡ Focus Environments</div>
         <p class="studio-section-desc" style="color:var(--muted);font-size:11px;margin:4px 0 12px;">Instantly align your workspace configuration with your task mode.</p>
         <div class="preset-row" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">
-          <button class="preset-btn btn-ghost" onclick="applyFocusEnv('deep_work')" style="font-size:12px;padding:8px;text-align:left;" title="Deep Work: Focus vignette, brown noise, 50m timer">🎯 Deep Work</button>
-          <button class="preset-btn btn-ghost" onclick="applyFocusEnv('study_mode')" style="font-size:12px;padding:8px;text-align:left;" title="Study Mode: Constellations, lofi chimes, 25m timer">📚 Study</button>
-          <button class="preset-btn btn-ghost" onclick="applyFocusEnv('coding_mode')" style="font-size:12px;padding:8px;text-align:left;" title="Coding Mode: Matrix rain, cyber hum, keystroke thocks, 90m timer">💻 Coding</button>
-          <button class="preset-btn btn-ghost" onclick="applyFocusEnv('exam_prep')" style="font-size:12px;padding:8px;text-align:left;" title="Exam Prep: Lattice grid, white noise, inline quizzes, 45m timer">✍️ Exam Prep</button>
-          <button class="preset-btn btn-ghost" onclick="applyFocusEnv('creative_flow')" style="font-size:12px;padding:8px;text-align:left;" title="Creative Flow: Mesh gradients, ambient swells, 30m timer">🎨 Creative</button>
-          <button class="preset-btn btn-ghost" onclick="applyFocusEnv('reading_mode')" style="font-size:12px;padding:8px;text-align:left;" title="Reading Mode: Ambient ocean, rain sounds, soft lights">📖 Reading</button>
+          <button class="preset-btn btn-ghost" id="btn-preset-deep-work" onclick="applyFocusEnv('deep_work')" style="font-size:12px;padding:8px;text-align:left;" title="Deep Work: Focus vignette, brown noise, 50m timer">🎯 Deep Work</button>
+          <button class="preset-btn btn-ghost" id="btn-preset-study" onclick="applyFocusEnv('study_mode')" style="font-size:12px;padding:8px;text-align:left;" title="Study Mode: Constellations, lofi chimes, 25m timer">📚 Study</button>
+          <button class="preset-btn btn-ghost" id="btn-preset-coding" onclick="applyFocusEnv('coding_mode')" style="font-size:12px;padding:8px;text-align:left;" title="Coding Mode: Matrix rain, cyber hum, keystroke thocks, 90m timer">💻 Coding</button>
+          <button class="preset-btn btn-ghost" id="btn-preset-exam-prep" onclick="applyFocusEnv('exam_prep')" style="font-size:12px;padding:8px;text-align:left;" title="Exam Prep: Lattice grid, white noise, inline quizzes, 45m timer">✍️ Exam Prep</button>
+          <button class="preset-btn btn-ghost" id="btn-preset-creative" onclick="applyFocusEnv('creative_flow')" style="font-size:12px;padding:8px;text-align:left;" title="Creative Flow: Mesh gradients, ambient swells, 30m timer">🎨 Creative</button>
+          <button class="preset-btn btn-ghost" id="btn-preset-reading" onclick="applyFocusEnv('reading_mode')" style="font-size:12px;padding:8px;text-align:left;" title="Reading Mode: Ambient ocean, rain sounds, soft lights">📖 Reading</button>
         </div>
       </div>
 
@@ -876,10 +876,10 @@
         <input type="number" id="bridge-port-input" placeholder="8765" value="8765" />
       </div>
       <div style="display:flex;gap:8px;margin-top:16px;">
-        <button class="btn-secondary" onclick="closeBridgeModal()" style="flex:1;">Cancel</button>
-        <button class="btn-primary" onclick="saveBridgeSettings()" style="flex:1;">💾 Save & Connect</button>
+        <button class="btn-secondary" id="btn-bridge-cancel" onclick="closeBridgeModal()" style="flex:1;">Cancel</button>
+        <button class="btn-primary" id="btn-bridge-save" onclick="saveBridgeSettings()" style="flex:1;">💾 Save & Connect</button>
       </div>
-      <button class="btn-ghost" onclick="testBridgeConnection()" style="width:100%;margin-top:8px;">🔍 Test Connection</button>
+      <button class="btn-ghost" id="btn-bridge-test" onclick="testBridgeConnection()" style="width:100%;margin-top:8px;">🔍 Test Connection</button>
       <div id="bridge-test-result" style="margin-top:8px;font-size:13px;text-align:center;"></div>
     </div>
   </div>
