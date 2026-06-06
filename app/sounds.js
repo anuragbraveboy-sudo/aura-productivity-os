@@ -43,6 +43,12 @@ class AuraSounds {
     }
   }
 
+  // Aliases for compatibility with app.js calls
+  click() { this.playTap(); }
+  success() { this.playSuccess(); }
+  pomo() { this.playPomodoroComplete(); }
+  levelup() { this.playLevelUp(); }
+
   // Play interface tap sound
   playTap() {
     if (this.muted) return;
