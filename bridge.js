@@ -11,7 +11,11 @@ const AuraBridge = (() => {
   }
 
   function getBaseUrl() {
-    return bridgeIP ? `http://${bridgeIP}:${PORT}` : '';
+    if (!bridgeIP) return '';
+    if (bridgeIP.startsWith('http://') || bridgeIP.startsWith('https://')) {
+      return bridgeIP;
+    }
+    return `http://${bridgeIP}:${PORT}`;
   }
 
   // Check if bridge is reachable
