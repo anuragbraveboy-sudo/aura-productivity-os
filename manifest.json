@@ -1,0 +1,26 @@
+{
+  "name": "AURA — Academic Co-Pilot",
+  "short_name": "AURA",
+  "description": "Privacy-first, on-device academic co-pilot for students. Record lectures, generate AI summaries & flashcards, and plan study sessions.",
+  "start_url": "./index.html",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#00d4ff",
+  "background_color": "#0a0a0f",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%230a0a0f'/%3E%3Ccircle cx='96' cy='80' r='36' fill='none' stroke='%2300d4ff' stroke-width='4'/%3E%3Cpath d='M96 44 L96 30' stroke='%2300d4ff' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='96' cy='80' r='8' fill='%2300d4ff'/%3E%3Ctext x='96' y='156' text-anchor='middle' font-family='sans-serif' font-weight='700' font-size='28' fill='%23e8e8f0'%3EAURA%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%230a0a0f'/%3E%3Ccircle cx='256' cy='210' r='90' fill='none' stroke='%2300d4ff' stroke-width='8'/%3E%3Cpath d='M256 120 L256 80' stroke='%2300d4ff' stroke-width='6' stroke-linecap='round'/%3E%3Ccircle cx='256' cy='210' r='20' fill='%2300d4ff'/%3E%3Ctext x='256' y='410' text-anchor='middle' font-family='sans-serif' font-weight='700' font-size='72' fill='%23e8e8f0'%3EAURA%3C/text%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

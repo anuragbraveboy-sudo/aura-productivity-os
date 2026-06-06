@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#00d4ff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="AURA" />
+  <meta name="description" content="AURA — Gamified, AI-powered academic co-pilot and productivity RPG. Track progress, schedule lectures, and study with an on-device coach." />
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0a0f'/%3E%3Ccircle cx='32' cy='28' r='12' fill='none' stroke='%2300d4ff' stroke-width='2'/%3E%3Ccircle cx='32' cy='28' r='3' fill='%2300d4ff'/%3E%3Ctext x='32' y='54' text-anchor='middle' font-family='sans-serif' font-weight='700' font-size='12' fill='%23e8e8f0'%3EAURA%3C/text%3E%3C/svg%3E" />
+
+  <!-- Google Font: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+  <title>AURA — Gamified AI Academic Co-Pilot</title>
+</head>
+<body>
+
+  <!-- Fullscreen Overlays for Focus Modes -->
+  <div class="pomo-screen-border" id="pomo-border"></div>
+  <div class="focus-vignette" id="focus-vignette"></div>
+
+  <!-- ═══════════════════════════════════════
+       LANDING PORTAL / ENTRY SCREEN
+       ═══════════════════════════════════════ -->
+  <div class="landing-portal" id="landing-portal">
+    <div class="landing-content premium-glass">
+      <div class="landing-logo">
+        <svg viewBox="0 0 64 64" class="logo-svg" style="width:50px;height:50px;display:inline-block;vertical-align:middle;margin-right:10px;">
+          <rect width="64" height="64" rx="16" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+          <circle cx="32" cy="32" r="15" fill="none" stroke="url(#logoGrad)" stroke-width="2.5" />
+          <circle cx="32" cy="32" r="6" fill="#7c4dff" />
+          <circle cx="32" cy="32" r="2.5" fill="#00f0ff" />
+          <defs>
+            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00f0ff" />
+              <stop offset="100%" stop-color="#7c4dff" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="logo-text">AURA</span>
+      </div>
+      <h1 class="landing-title">AI-Powered Academic <span class="gradient-greeting">Co-Pilot & RPG</span></h1>
+      <p class="landing-tagline">Transform your study habits. Gamify your focus. Automate your notes. Elevate your grades.</p>
+
+      <div class="landing-features">
+        <div class="lf-item">
+          <span class="lf-icon">🎙️</span>
+          <div>
+            <strong>Voice Lecture Capture</strong>
+            <p>Captures real-time audio/video with automated AI notes.</p>
+          </div>
+        </div>
+        <div class="lf-item">
+          <span class="lf-icon">🏆</span>
+          <div>
+            <strong>Productivity RPG Engine</strong>
+            <p>Level up by doing Pomodoros, flashcards, and finishing tasks.</p>
+          </div>
+        </div>
+        <div class="lf-item">
+          <span class="lf-icon">🤖</span>
+          <div>
+            <strong>Integrated Study Coach</strong>
+            <p>Direct triggers to generate cards, quizzes, and revision dates.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="landing-actions">
+        <button class="btn-primary large-action" onclick="enterApp(false)">✨ Launch Workspace</button>
+        <button class="btn-secondary large-action" onclick="enterApp(true)">🚀 Hackathon Demo Mode</button>
+      </div>
+      <p class="landing-demo-hint">💡 **Demo Mode** seeds the workspace instantly with sample lectures, calendars, streaks, and RPG stats.</p>
+    </div>
+  </div>
+
+  <div class="status-bar"></div>
+
+  <!-- Bridge Status Indicator -->
+  <div class="bridge-bar" id="bridge-bar" onclick="openBridgeSettings()">
+    <div class="bridge-dot" id="bridge-dot"></div>
+    <span id="bridge-label">PC Bridge: Disconnected</span>
+  </div>
+
+  <div class="app-container">
+
+    <!-- ═══════════════════════════════════════
+         HOME SCREEN
+         ═══════════════════════════════════════ -->
+    <section id="screen-home" class="screen active">
+
+      <!-- HERO DASHBOARD / DAILY COMMAND CENTER -->
+      <div class="command-center premium-glass">
+        <div class="cc-header">
+          <div>
+            <h1 class="screen-title gradient-greeting" id="home-greeting">Good evening Krish 🌌</h1>
+            <p class="screen-subtitle" id="home-subtitle" style="margin-bottom:0;">Ready for a deep study session?</p>
+          </div>
+          <div class="cc-profile-badge">
+            <div class="rpg-avatar" id="rpg-level-num">Lvl 1</div>
+            <div class="rpg-level-label">Level</div>
+          </div>
+        </div>
+
+        <!-- RPG Progress Tracker -->
+        <div class="rpg-xp-container">
+          <div class="rpg-xp-bar-wrapper">
+            <div class="rpg-xp-fill" id="rpg-xp-fill" style="width: 0%;"></div>
+          </div>
+          <div class="rpg-xp-text" id="rpg-xp-text">0 / 300 XP to Level 2</div>
+        </div>
+
+        <div class="cc-insights" id="cc-insights">
+          🤖 <em>Study Coach:</em> Add your first notes or complete a focus session to unlock custom recommendations!
+        </div>
+      </div>
+
+      <div class="header-action-row" style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;">
+        <div class="api-status" onclick="AuraAI.showKeyModal()">
+          <span class="api-dot" id="api-dot"></span>
+          <span class="api-text" id="api-text">Setup AI</span>
+        </div>
+        <div class="theme-picker-scroll">
+          <div class="theme-picker">
+            <div class="theme-circle theme-dark active" onclick="setTheme('dark')" title="Cosmic Nebula (Default)">🌌</div>
+            <div class="theme-circle theme-aurora" onclick="setTheme('aurora')" title="Aurora Ocean">🌊</div>
+            <div class="theme-circle theme-solar" onclick="setTheme('solar')" title="Solar Flare">🔥</div>
+            <div class="theme-circle theme-sakura locked" id="theme-btn-sakura" onclick="setTheme('sakura')" title="Sakura Bloom (Lvl 2)">🌸</div>
+            <div class="theme-circle theme-cyberpunk locked" id="theme-btn-cyberpunk" onclick="setTheme('cyberpunk')" title="Cyberpunk (Lvl 3)">⚡</div>
+            <div class="theme-circle theme-light" onclick="setTheme('light')" title="Clean Light">☀️</div>
+            <div class="theme-circle theme-midnight" onclick="setTheme('midnight')" title="Midnight Blue">🌑</div>
+          </div>
+        </div>
+        <button class="btn-icon settings-btn" onclick="openSettings()" title="Settings">
+          <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-row" style="margin-top:16px;">
+        <div class="stat-card glass-card">
+          <div class="stat-value" id="stat-lectures">0</div>
+          <div class="stat-label">Lectures</div>
+        </div>
+        <div class="stat-card glass-card">
+          <div class="stat-value" id="stat-flashcards">0</div>
+          <div class="stat-label">Flashcards</div>
+        </div>
+        <div class="stat-card glass-card">
+          <div class="stat-value" id="stat-streak">0</div>
+          <div class="stat-label">Day Streak</div>
+        </div>
+      </div>
+
+      <!-- CIRCULAR POMODORO FOCUS HUB -->
+      <div class="dashboard-widget" id="widget-focus-hub">
+        <div class="section-label">🍅 Focus Hub</div>
+        <div class="pomodoro-card glass-card">
+          <div class="pomo-hub-container">
+            <svg class="pomo-svg" viewBox="0 0 160 160">
+              <circle class="pomo-ring-bg" cx="80" cy="80" r="70"></circle>
+              <circle class="pomo-ring-progress" id="pomo-ring" cx="80" cy="80" r="70"></circle>
+            </svg>
+            <div class="pomo-display-overlay">
+              <div class="pomo-time" id="pomo-time">25:00</div>
+              <div class="pomo-label" id="pomo-label">Focus Mode</div>
+            </div>
+          </div>
+
+          <div class="pomo-controls">
+            <button class="btn-icon" onclick="pomodoroAction('reset')" title="Reset">↺</button>
+            <button class="pomo-main-btn" id="pomo-btn" onclick="pomodoroAction('toggle')">▶</button>
+            <button class="btn-icon" onclick="pomodoroAction('skip')" title="Skip">⏭</button>
+          </div>
+          <div class="pomo-modes">
+            <button class="pomo-mode active" data-mins="25" onclick="setPomoMode(25,'Focus',this)">25 min</button>
+            <button class="pomo-mode" data-mins="5" onclick="setPomoMode(5,'Short Break',this)">5 min</button>
+            <button class="pomo-mode" data-mins="15" onclick="setPomoMode(15,'Long Break',this)">15 min</button>
+            <button class="pomo-mode" data-mins="50" onclick="setPomoMode(50,'Deep Work',this)">50 min</button>
+          </div>
+          <div class="pomo-custom">
+            <button class="pomo-mode" onclick="showCustomTimer()">⏱️ Custom</button>
+            <div class="pomo-custom-input" id="pomo-custom-input" style="display:none;">
+              <input type="number" id="custom-mins" min="1" max="120" placeholder="Mins" />
+              <button class="btn-primary" style="padding:6px 16px;font-size:12px;" onclick="applyCustomTimer()">Set</button>
+            </div>
+          </div>
+          <div class="pomo-stats">
+            <span id="pomo-sessions">0</span> sessions completed today
+          </div>
+        </div>
+      </div>
+
+      <!-- ANALYTICS DASHBOARD -->
+      <div class="dashboard-widget" id="widget-analytics-chart">
+        <div class="section-label">📊 Weekly Study Hours</div>
+        <div class="analytics-card glass-card">
+          <div class="analytics-chart">
+            <div class="chart-bar-container" id="analytics-bar-chart">
+              <div class="chart-bar" style="--val: 10%;" data-label="Mon"><span class="bar-val-label">0.5h</span></div>
+              <div class="chart-bar" style="--val: 10%;" data-label="Tue"><span class="bar-val-label">0.5h</span></div>
+              <div class="chart-bar" style="--val: 10%;" data-label="Wed"><span class="bar-val-label">0.5h</span></div>
+              <div class="chart-bar" style="--val: 10%;" data-label="Thu"><span class="bar-val-label">0.5h</span></div>
+              <div class="chart-bar" style="--val: 10%;" data-label="Fri"><span class="bar-val-label">0.5h</span></div>
+              <div class="chart-bar" style="--val: 10%;" data-label="Sat"><span class="bar-val-label">0.5h</span></div>
+              <div class="chart-bar" style="--val: 10%;" data-label="Sun"><span class="bar-val-label">0.5h</span></div>
+            </div>
+          </div>
+          <div class="analytics-stats">
+            <div class="a-stat">
+              <span class="a-stat-num" id="analytics-focus-hours">3.5h</span>
+              <span class="a-stat-label">Focus Time</span>
+            </div>
+            <div class="a-stat">
+              <span class="a-stat-num" id="analytics-completion-rate">0%</span>
+              <span class="a-stat-label">Tasks Finished</span>
+            </div>
+            <div class="a-stat">
+              <span class="a-stat-num" id="analytics-rpg-xp">0 XP</span>
+              <span class="a-stat-label">Total Gained</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="section-label">Quick Actions</div>
+      <div class="quick-actions">
+        <div class="quick-action-btn glass-card" onclick="navigateTo('record')">
+          <div class="qa-icon qa-red">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="stroke:var(--danger);"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          </div>
+          <div class="qa-label">Record<br>Lecture</div>
+        </div>
+        <div class="quick-action-btn glass-card" onclick="navigateTo('study')">
+          <div class="qa-icon qa-blue">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="stroke:var(--accent);"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          </div>
+          <div class="qa-label">Study<br>Notes</div>
+        </div>
+        <div class="quick-action-btn glass-card" onclick="navigateTo('calendar')">
+          <div class="qa-icon qa-purple">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="stroke:#7c4dff;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div class="qa-label">View<br>Calendar</div>
+        </div>
+        <div class="quick-action-btn glass-card" onclick="openSettings()">
+          <div class="qa-icon qa-green">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="stroke:var(--success);"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+          </div>
+          <div class="qa-label">API<br>Key</div>
+        </div>
+      </div>
+
+      <!-- Sync to PC Bridge Card -->
+      <div class="section-label">🔗 iQOO Office Kit Bridge</div>
+      <div class="bridge-card glass-card" id="bridge-card" onclick="syncToPC()">
+        <div class="bridge-card-left">
+          <div class="bridge-card-icon">📱⇄💻</div>
+          <div class="bridge-card-info">
+            <div class="bridge-card-title">Sync to PC</div>
+            <div class="bridge-card-desc" id="bridge-card-desc">Send lectures to laptop for heavy processing</div>
+          </div>
+        </div>
+        <div class="bridge-sync-btn" id="bridge-sync-btn">Sync</div>
+      </div>
+
+      <!-- Upcoming Deadlines -->
+      <div class="dashboard-widget" id="widget-deadlines">
+        <div class="section-label">Upcoming Deadlines</div>
+        <div id="home-deadlines"></div>
+      </div>
+
+      <!-- Recent Lectures -->
+      <div class="dashboard-widget" id="widget-lectures">
+        <div class="section-label">Recent Lectures</div>
+        <div id="home-lectures"></div>
+      </div>
+
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         RECORD SCREEN
+         ═══════════════════════════════════════ -->
+    <section id="screen-record" class="screen">
+
+      <h1 class="screen-title">Record Lecture</h1>
+      <p class="screen-subtitle">Tap to start capturing speech in real-time</p>
+
+      <div class="record-center">
+
+        <!-- Record Mode Toggle -->
+        <div class="record-mode-toggle">
+          <button class="mode-btn active" id="mode-audio" onclick="setRecordMode('audio')">
+            <svg class="svg-icon" style="width:16px;height:16px;margin-right:4px;" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            Audio
+          </button>
+          <button class="mode-btn" id="mode-video" onclick="setRecordMode('video')">
+            <svg class="svg-icon" style="width:16px;height:16px;margin-right:4px;" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+            Video
+          </button>
+        </div>
+
+        <!-- Video Preview (hidden by default) -->
+        <div class="video-preview-container" id="video-preview-container">
+          <video id="video-preview" autoplay muted playsinline></video>
+        </div>
+        <button class="btn-ghost" id="cam-flip-btn" style="display:none;" onclick="flipCamera()">🔄 Flip Camera</button>
+
+        <!-- Record Button with Pulse -->
+        <div class="record-btn-wrapper" id="record-btn-wrapper">
+          <div class="pulse-ring"></div>
+          <div class="pulse-ring"></div>
+          <div class="pulse-ring"></div>
+          <button class="record-btn" id="record-btn">
+            <svg class="svg-icon xlarge" viewBox="0 0 24 24" style="stroke:#fff;stroke-width:2.5;"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          </button>
+        </div>
+
+        <!-- CSS Audio Waveform Visualizer -->
+        <div class="audio-waveform-container" id="audio-waveform">
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+        </div>
+
+        <!-- Timer -->
+        <div class="record-timer" id="record-timer">00:00</div>
+
+        <!-- Status -->
+        <div class="record-status" id="record-status">Tap the button to start recording</div>
+
+        <!-- Live Transcript -->
+        <div class="transcript-box glass-card" id="transcript-box">
+          <span style="color:var(--muted)">Your live transcript will appear here...</span>
+        </div>
+
+        <!-- Manual Type Fallback -->
+        <div class="type-fallback" id="type-fallback">
+          <button class="btn-ghost" onclick="toggleTypeMode()" id="type-mode-btn">
+            <svg class="svg-icon" style="width:16px;height:16px;margin-right:4px;" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><line x1="6" y1="8" x2="6" y2="8"/><line x1="10" y1="8" x2="10" y2="8"/><line x1="14" y1="8" x2="14" y2="8"/><line x1="18" y1="8" x2="18" y2="8"/><line x1="6" y1="12" x2="6" y2="12"/><line x1="10" y1="12" x2="10" y2="12"/><line x1="14" y1="12" x2="14" y2="12"/><line x1="18" y1="12" x2="18" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/></svg>
+            Or type/paste notes manually
+          </button>
+          <textarea class="type-textarea glass-card" id="type-textarea" placeholder="Paste or type your lecture notes here..." rows="6" style="display:none;"></textarea>
+          <button class="btn-primary" id="type-save-btn" style="display:none;width:100%;margin-top:8px;" onclick="saveTypedNotes()">💾 Save Typed Notes</button>
+        </div>
+
+        <!-- File Upload -->
+        <div class="upload-section">
+          <div class="section-label">📎 Upload Notes</div>
+          <div class="upload-area glass-card" id="upload-area">
+            <div class="upload-icon">
+              <svg class="svg-icon xlarge" style="stroke:var(--accent);" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+            </div>
+            <div class="upload-text">Tap to upload PDF, TXT, or MD files</div>
+            <div class="upload-hint">or drag & drop here</div>
+            <input type="file" id="file-upload" accept=".txt,.pdf,.md" style="display:none" />
+          </div>
+        </div>
+
+        <!-- YouTube to Notes -->
+        <div class="yt-section">
+          <div class="section-label">
+            <svg class="svg-icon" style="width:16px;height:16px;margin-right:4px;" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+            YouTube to Notes
+          </div>
+          <div class="glass-card" style="padding:16px;">
+            <p style="font-size:13px;color:var(--muted);margin-bottom:10px;">Paste a YouTube link to generate AI notes from the video</p>
+            <div style="display:flex;gap:8px;">
+              <input type="url" id="yt-url-input" class="modal-input" placeholder="https://youtube.com/watch?v=..." style="flex:1;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:13px;" />
+              <button class="btn-primary" style="padding:10px 16px;font-size:13px;white-space:nowrap;" onclick="generateYTNotes()">📝 Generate</button>
+            </div>
+            <div id="yt-result" style="margin-top:12px;"></div>
+          </div>
+        </div>
+
+        <!-- Post-Record Actions -->
+        <div class="post-record" id="post-record">
+          <input type="text" class="lecture-title-input" id="lecture-title-input" placeholder="Lecture title..." />
+          <div class="post-record-actions">
+            <button class="btn-secondary" onclick="saveLectureFromRecording()">💾 Save Only</button>
+            <button class="btn-primary" onclick="summarizeAndSave()">✨ Summarize & Save</button>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         STUDY SCREEN
+         ═══════════════════════════════════════ -->
+    <section id="screen-study" class="screen">
+
+      <h1 class="screen-title">Study Hub</h1>
+      <p class="screen-subtitle">Review, revise, and ace your exams</p>
+
+      <!-- Lecture Detail View (hidden by default) -->
+      <div id="lecture-detail" class="lecture-detail">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="detail-back" onclick="hideLectureDetail()">← Back to list</div>
+          <button class="btn-ghost" style="color:var(--danger);" id="detail-delete-btn">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="stroke:var(--danger); width:16px; height:16px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+            Delete
+          </button>
+        </div>
+        <h2 class="detail-title" id="detail-title"></h2>
+        <p class="detail-meta" id="detail-meta"></p>
+
+        <div class="detail-section-title">Transcript</div>
+        <div class="detail-content glass-card" id="detail-transcript"></div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="detail-section-title">AI Summary</div>
+          <div id="detail-summary-actions"></div>
+        </div>
+        <div class="detail-content glass-card" id="detail-summary"></div>
+
+        <div class="detail-section-title">Flashcards</div>
+        <div id="detail-flashcards"></div>
+      </div>
+
+      <!-- Main Study View -->
+      <div id="study-main">
+        <!-- Tabs -->
+        <div class="study-tabs">
+          <div class="study-tab active" data-panel="lectures">
+            <svg class="svg-icon" style="width:14px;height:14px;margin-right:4px;" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Lectures
+          </div>
+          <div class="study-tab" data-panel="flashcards">
+            <svg class="svg-icon" style="width:14px;height:14px;margin-right:4px;" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+            Cards
+          </div>
+          <div class="study-tab" data-panel="chat">
+            <svg class="svg-icon" style="width:14px;height:14px;margin-right:4px;" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            AI Coach
+          </div>
+        </div>
+
+        <!-- Lectures Panel -->
+        <div id="panel-lectures" class="study-panel active">
+          <div id="study-lectures-list"></div>
+        </div>
+
+        <!-- Flashcards Panel -->
+        <div id="panel-flashcards" class="study-panel">
+          <div class="flashcard-deck" id="flashcard-deck"></div>
+          <div class="flashcard-nav">
+            <button class="btn-icon" onclick="prevFlashcard()">◀</button>
+            <span class="flashcard-counter" id="flashcard-counter">0 / 0</span>
+            <button class="btn-icon" onclick="nextFlashcard()">▶</button>
+          </div>
+        </div>
+
+        <!-- Chat Panel (AI Coach) -->
+        <div id="panel-chat" class="study-panel">
+          <div class="chat-header">
+            <span class="chat-title">💬 AI Study Coach</span>
+            <button class="clear-chat-btn" onclick="clearChatHistory()">🗑 Clear Chat</button>
+          </div>
+          <div class="chat-container" id="chat-messages">
+            <div class="chat-bubble ai">
+              👋 Hello Krish! I'm your **AURA AI Study Coach**.
+              <br/><br/>
+              Ask me to explain a concept from your notes, or click one of the quick actions below to streamline your study workflow!
+            </div>
+          </div>
+          
+          <!-- AI Coach Multi-Action Panel -->
+          <div class="coach-triggers glass-card">
+            <div class="coach-trigger-title">⚡ Instant Study Workflows</div>
+            <div class="coach-trigger-grid">
+              <button class="btn-secondary coach-btn" onclick="triggerCoachAction('flashcards')">🃏 Make Flashcards</button>
+              <button class="btn-secondary coach-btn" onclick="triggerCoachAction('quiz')">📝 Create a Quiz</button>
+              <button class="btn-secondary coach-btn" onclick="triggerCoachAction('schedule')">📅 Schedule Revision</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         CALENDAR SCREEN
+         ═══════════════════════════════════════ -->
+    <section id="screen-calendar" class="screen">
+
+      <h1 class="screen-title">Calendar</h1>
+      <p class="screen-subtitle">Smart study schedule & deadlines</p>
+
+      <!-- Full Month Grid -->
+      <div id="cal-month-container"></div>
+
+      <!-- Selected Day Detail Panel -->
+      <div id="selected-day-info"></div>
+
+      <!-- Action Buttons -->
+      <div class="cal-actions" style="margin-top:12px;">
+        <button class="btn-primary" onclick="toggleCalForm('deadline')">📋 Add Deadline</button>
+        <button class="btn-secondary" onclick="toggleCalForm('session')">📝 Add Study Session</button>
+      </div>
+
+      <!-- Add Deadline Form (inline, hidden) -->
+      <div class="cal-form glass-card" id="cal-deadline-form">
+        <div class="section-label" style="margin-top:0;">📋 Add Deadline</div>
+        <input type="text" id="dl-title-input" placeholder="Title (e.g. Problem Set #3)" />
+        <input type="text" id="dl-course-input" placeholder="Course (e.g. CS 229)" />
+        <input type="date" id="dl-date-input" />
+        <select id="dl-priority-input">
+          <option value="low">Low Priority</option>
+          <option value="medium" selected>Medium Priority</option>
+          <option value="high">High Priority</option>
+        </select>
+        <div class="cal-actions">
+          <button class="btn-primary" onclick="handleAddDeadlineInline()">✅ Add Deadline</button>
+          <button class="btn-secondary" onclick="toggleCalForm('deadline')">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Add Study Session Form (inline, hidden) -->
+      <div class="cal-form glass-card" id="cal-session-form">
+        <div class="section-label" style="margin-top:0;">📝 Add Study Session</div>
+        <input type="text" id="ss-title-input" placeholder="Title (e.g. Review Chapter 5)" />
+        <input type="time" id="ss-time-input" />
+        <input type="number" id="ss-duration-input" placeholder="Duration (minutes)" min="5" max="480" value="60" />
+        <div class="cal-actions">
+          <button class="btn-primary" onclick="handleAddSessionInline()">✅ Add Session</button>
+          <button class="btn-secondary" onclick="toggleCalForm('session')">Cancel</button>
+        </div>
+      </div>
+
+      <!-- AI Study Slots (Timeline) -->
+      <div class="section-label">🤖 AI-Suggested Study Plan</div>
+      <div class="timeline" id="cal-timeline"></div>
+
+      <!-- Deadlines List -->
+      <div class="section-label">📋 All Deadlines</div>
+      <div id="cal-deadlines"></div>
+
+    </section>
+
+  </div><!-- /.app-container -->
+
+  <!-- ═══════════════════════════════════════
+       FAB (Quick Record)
+       ═══════════════════════════════════════ -->
+  <button class="fab" id="fab" title="Quick Record">
+    <svg class="svg-icon large" viewBox="0 0 24 24" style="stroke:#000;stroke-width:2.5;"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+  </button>
+
+  <!-- ═══════════════════════════════════════
+       BOTTOM NAVIGATION (Floating Capsule)
+       ═══════════════════════════════════════ -->
+  <nav class="bottom-nav">
+    <div class="nav-item active" data-screen="home">
+      <span class="nav-icon">
+        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </span>
+      <span class="nav-label">Home</span>
+    </div>
+    <div class="nav-item" data-screen="record">
+      <span class="nav-icon">
+        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      </span>
+      <span class="nav-label">Record</span>
+    </div>
+    <div class="nav-item" data-screen="study">
+      <span class="nav-icon">
+        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      </span>
+      <span class="nav-label">Study</span>
+    </div>
+    <div class="nav-item" data-screen="calendar">
+      <span class="nav-icon">
+        <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </span>
+      <span class="nav-label">Calendar</span>
+    </div>
+  </nav>
+
+  <!-- Chat Input Bar (shown only on Study screen) -->
+  <div class="chat-input-bar" id="chat-input-bar">
+    <input type="text" id="chat-input" placeholder="Ask your study coach..." />
+    <button class="send-btn" id="chat-send-btn">➤</button>
+  </div>
+
+  </div>
+
+  <!-- AURA Studio Side Drawer -->
+  <div class="studio-drawer premium-glass" id="aura-studio-drawer">
+    <div class="studio-drawer-header">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:20px;">🎨</span>
+        <h3 style="margin:0;font-size:18px;font-weight:700;">AURA Studio</h3>
+      </div>
+      <button class="btn-close-studio" onclick="toggleStudio(false)" style="background:none;border:none;color:var(--text);font-size:18px;cursor:pointer;">✕</button>
+    </div>
+    <div class="studio-drawer-body" style="flex:1;overflow-y:auto;padding:16px;box-sizing:border-box;">
+      
+      <!-- Section: Focus Environments -->
+      <div class="studio-section" style="margin-bottom:24px;">
+        <div class="studio-section-label" style="font-size:12px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;border-bottom:1px solid var(--border);padding-bottom:4px;">⚡ Focus Environments</div>
+        <p class="studio-section-desc" style="color:var(--muted);font-size:11px;margin:4px 0 12px;">Instantly align your workspace configuration with your task mode.</p>
+        <div class="preset-row" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">
+          <button class="preset-btn btn-ghost" onclick="applyFocusEnv('deep_work')" style="font-size:12px;padding:8px;text-align:left;" title="Deep Work: Focus vignette, brown noise, 50m timer">🎯 Deep Work</button>
+          <button class="preset-btn btn-ghost" onclick="applyFocusEnv('study_mode')" style="font-size:12px;padding:8px;text-align:left;" title="Study Mode: Constellations, lofi chimes, 25m timer">📚 Study</button>
+          <button class="preset-btn btn-ghost" onclick="applyFocusEnv('coding_mode')" style="font-size:12px;padding:8px;text-align:left;" title="Coding Mode: Matrix rain, cyber hum, keystroke thocks, 90m timer">💻 Coding</button>
+          <button class="preset-btn btn-ghost" onclick="applyFocusEnv('exam_prep')" style="font-size:12px;padding:8px;text-align:left;" title="Exam Prep: Lattice grid, white noise, inline quizzes, 45m timer">✍️ Exam Prep</button>
+          <button class="preset-btn btn-ghost" onclick="applyFocusEnv('creative_flow')" style="font-size:12px;padding:8px;text-align:left;" title="Creative Flow: Mesh gradients, ambient swells, 30m timer">🎨 Creative</button>
+          <button class="preset-btn btn-ghost" onclick="applyFocusEnv('reading_mode')" style="font-size:12px;padding:8px;text-align:left;" title="Reading Mode: Ambient ocean, rain sounds, soft lights">📖 Reading</button>
+        </div>
+      </div>
+
+      <!-- Section: Theme Marketplace -->
+      <div class="studio-section" style="margin-bottom:24px;">
+        <div class="studio-section-label" style="font-size:12px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;border-bottom:1px solid var(--border);padding-bottom:4px;">🌌 Theme Marketplace</div>
+        <p class="studio-section-desc" style="color:var(--muted);font-size:11px;margin:4px 0 12px;">Unlock premium themes as you gain XP and Level Up.</p>
+        <div class="studio-themes-grid" style="display:grid;grid-template-columns:1fr;gap:8px;">
+          <!-- Midnight Nebula -->
+          <div class="studio-theme-card active" id="theme-card-midnight-nebula" onclick="setStudioTheme('midnight')">
+            <div class="theme-card-color" style="background:linear-gradient(135deg, #03001e, #7303c0, #ec38bc);width:40px;height:40px;border-radius:8px;"></div>
+            <div class="theme-card-meta" style="flex:1;display:flex;justify-content:space-between;align-items:center;margin-left:10px;">
+              <span class="theme-card-name" style="font-size:13px;font-weight:600;">Midnight Blue (Nebula)</span>
+              <span class="theme-card-status" style="font-size:11px;color:var(--success);">Unlocked</span>
+            </div>
+          </div>
+          <!-- Cosmic Nebula -->
+          <div class="studio-theme-card" id="theme-card-cosmic" onclick="setStudioTheme('cosmic')">
+            <div class="theme-card-color" style="background:linear-gradient(135deg, #05050f, #090918, #7c4dff);width:40px;height:40px;border-radius:8px;"></div>
+            <div class="theme-card-meta" style="flex:1;display:flex;justify-content:space-between;align-items:center;margin-left:10px;">
+              <span class="theme-card-name" style="font-size:13px;font-weight:600;">Cosmic Nebula</span>
+              <span class="theme-card-status" style="font-size:11px;color:var(--success);">Unlocked</span>
+            </div>
+          </div>
+          <!-- Cyber Luxury -->
+          <div class="studio-theme-card" id="theme-card-cyber-luxury" onclick="setStudioTheme('cyber-luxury')">
+            <div class="theme-card-color" style="background:linear-gradient(135deg, #050505, #d4af37, #1f2833);width:40px;height:40px;border-radius:8px;"></div>
+            <div class="theme-card-meta" style="flex:1;display:flex;justify-content:space-between;align-items:center;margin-left:10px;">
+              <span class="theme-card-name" style="font-size:13px;font-weight:600;">Cyber Luxury</span>
+              <span class="theme-card-status theme-locked-status" id="lock-lbl-cyber-luxury" style="font-size:11px;color:var(--danger);">🔒 Level 4</span>
+            </div>
+          </div>
+          <!-- Aurora Ocean -->
+          <div class="studio-theme-card" id="theme-card-aurora-ocean" onclick="setStudioTheme('aurora')">
+            <div class="theme-card-color" style="background:linear-gradient(135deg, #071315, #00ffcc, #0b1c1c);width:40px;height:40px;border-radius:8px;"></div>
+            <div class="theme-card-meta" style="flex:1;display:flex;justify-content:space-between;align-items:center;margin-left:10px;">
+              <span class="theme-card-name" style="font-size:13px;font-weight:600;">Aurora Ocean</span>
+              <span class="theme-card-status" style="font-size:11px;color:var(--success);">Unlocked</span>
+            </div>
+          </div>
+          <!-- Sakura Dream -->
+          <div class="studio-theme-card" id="theme-card-sakura-dream" onclick="setStudioTheme('sakura')">
+            <div class="theme-card-color" style="background:linear-gradient(135deg, #0f050d, #ffa2d0, #ffb3d9);width:40px;height:40px;border-radius:8px;"></div>
+            <div class="theme-card-meta" style="flex:1;display:flex;justify-content:space-between;align-items:center;margin-left:10px;">
+              <span class="theme-card-name" style="font-size:13px;font-weight:600;">Sakura Dream</span>
+              <span class="theme-card-status theme-locked-status" id="lock-lbl-sakura-dream" style="font-size:11px;color:var(--danger);">🔒 Level 2</span>
+            </div>
+          </div>
+          <!-- Solar Flare -->
+          <div class="studio-theme-card" id="theme-card-solar-flare" onclick="setStudioTheme('solar')">
+            <div class="theme-card-color" style="background:linear-gradient(135deg, #0d0705, #ff6a00, #ffd700);width:40px;height:40px;border-radius:8px;"></div>
+            <div class="theme-card-meta" style="flex:1;display:flex;justify-content:space-between;align-items:center;margin-left:10px;">
+              <span class="theme-card-name" style="font-size:13px;font-weight:600;">Solar Flare</span>
+              <span class="theme-card-status" style="font-size:11px;color:var(--success);">Unlocked</span>
+            </div>
+          </div>
+          <!-- Arctic Glass -->
+          <div class="studio-theme-card" id="theme-card-arctic-glass" onclick="setStudioTheme('light')">
+            <div class="theme-card-color" style="background:linear-gradient(135deg, #f0f4f8, #0088cc, #ffffff);width:40px;height:40px;border-radius:8px;border:1px solid var(--border);"></div>
+            <div class="theme-card-meta" style="flex:1;display:flex;justify-content:space-between;align-items:center;margin-left:10px;">
+              <span class="theme-card-name" style="font-size:13px;font-weight:600;">Arctic Glass</span>
+              <span class="theme-card-status" style="font-size:11px;color:var(--success);">Unlocked</span>
+            </div>
+          </div>
+          <!-- Cosmic Scholar -->
+          <div class="studio-theme-card" id="theme-card-cosmic-scholar" onclick="setStudioTheme('cosmic-scholar')">
+            <div class="theme-card-color" style="background:linear-gradient(135deg, #0d061f, #9d4edd, #5a189a);width:40px;height:40px;border-radius:8px;"></div>
+            <div class="theme-card-meta" style="flex:1;display:flex;justify-content:space-between;align-items:center;margin-left:10px;">
+              <span class="theme-card-name" style="font-size:13px;font-weight:600;">Cosmic Scholar</span>
+              <span class="theme-card-status" style="font-size:11px;color:var(--success);">Unlocked</span>
+            </div>
+          </div>
+          <!-- AI Core -->
+          <div class="studio-theme-card" id="theme-card-ai-core" onclick="setStudioTheme('ai-core')">
+            <div class="theme-card-color" style="background:linear-gradient(135deg, #030803, #39ff14, #001a00);width:40px;height:40px;border-radius:8px;"></div>
+            <div class="theme-card-meta" style="flex:1;display:flex;justify-content:space-between;align-items:center;margin-left:10px;">
+              <span class="theme-card-name" style="font-size:13px;font-weight:600;">AI Core</span>
+              <span class="theme-card-status" style="font-size:11px;color:var(--success);">Unlocked</span>
+            </div>
+          </div>
+          <!-- VisionOS -->
+          <div class="studio-theme-card" id="theme-card-vision-os" onclick="setStudioTheme('vision-os')">
+            <div class="theme-card-color" style="background:linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1), rgba(0,0,0,0.15));width:40px;height:40px;border-radius:8px;border:1px solid rgba(255,255,255,0.3);"></div>
+            <div class="theme-card-meta" style="flex:1;display:flex;justify-content:space-between;align-items:center;margin-left:10px;">
+              <span class="theme-card-name" style="font-size:13px;font-weight:600;">VisionOS</span>
+              <span class="theme-card-status" style="font-size:11px;color:var(--success);">Unlocked</span>
+            </div>
+          </div>
+          <!-- Future OS 2035 -->
+          <div class="studio-theme-card" id="theme-card-future-os" onclick="setStudioTheme('future-os')">
+            <div class="theme-card-color" style="background:linear-gradient(135deg, #08080a, #33333f, #00f0ff);width:40px;height:40px;border-radius:8px;"></div>
+            <div class="theme-card-meta" style="flex:1;display:flex;justify-content:space-between;align-items:center;margin-left:10px;">
+              <span class="theme-card-name" style="font-size:13px;font-weight:600;">Future OS 2035</span>
+              <span class="theme-card-status theme-locked-status" id="lock-lbl-future-os" style="font-size:11px;color:var(--danger);">🔒 Level 5</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Visualizer Engine -->
+      <div class="studio-section" style="margin-bottom:24px;">
+        <div class="studio-section-label" style="font-size:12px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;border-bottom:1px solid var(--border);padding-bottom:4px;">🧠 Visualizer Engine</div>
+        
+        <div class="form-group" style="margin-bottom:12px;">
+          <label for="bg-style-select" style="display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;">Visualizer Style</label>
+          <select id="bg-style-select" onchange="updateStudioBackground()" style="width:100%;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:13px;">
+            <option value="constellations">🌌 Constellation Stars</option>
+            <option value="aurora-neural">🌊 Aurora Neural Flow</option>
+            <option value="liquid-energy">🧪 Liquid Energy</option>
+            <option value="cosmic-dust">✨ Cosmic Dust</option>
+            <option value="topo-intel">📐 Topographic contour</option>
+            <option value="brain-pulse">⚡ Neural Brain Pulse</option>
+            <option value="mesh-gradient">🌈 Dynamic Mesh Gradient</option>
+            <option value="ambient-ocean">🏊 Ambient Ocean ripples</option>
+            <option value="particle-galaxy">🌀 Particle Galaxy arm</option>
+            <option value="quantum-field">🪐 Quantum vector field</option>
+            <option value="minimal-focus">🚫 Minimal Focus Mode</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom:12px;">
+          <div class="slider-label-row" style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:4px;">
+            <label for="bg-intensity-slider">Visualizer Brightness</label>
+            <span class="slider-val" id="bg-intensity-val">85%</span>
+          </div>
+          <input type="range" id="bg-intensity-slider" min="0.1" max="2.0" step="0.05" value="0.85" oninput="updateStudioSlidersLive()" style="width:100%;" />
+        </div>
+
+        <div class="form-group" style="margin-bottom:12px;">
+          <div class="slider-label-row" style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:4px;">
+            <label for="bg-speed-slider">Flow Velocity</label>
+            <span class="slider-val" id="bg-speed-val">1.0x</span>
+          </div>
+          <input type="range" id="bg-speed-slider" min="0.2" max="3.0" step="0.1" value="1.0" oninput="updateStudioSlidersLive()" style="width:100%;" />
+        </div>
+
+        <div class="form-group" style="margin-bottom:12px;">
+          <div class="slider-label-row" style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:4px;">
+            <label for="bg-density-slider">Particle/Element Density</label>
+            <span class="slider-val" id="bg-density-val">100%</span>
+          </div>
+          <input type="range" id="bg-density-slider" min="0.2" max="2.0" step="0.1" value="1.0" oninput="updateStudioSlidersLive()" style="width:100%;" />
+        </div>
+        
+        <div class="form-group" style="margin-bottom:12px;">
+          <div class="slider-label-row" style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:4px;">
+            <label for="bg-glow-slider">Neon Glow Radius</label>
+            <span class="slider-val" id="bg-glow-val">40%</span>
+          </div>
+          <input type="range" id="bg-glow-slider" min="0" max="1.0" step="0.05" value="0.4" oninput="updateStudioSlidersLive()" style="width:100%;" />
+        </div>
+
+        <div class="form-group" style="margin-bottom:12px;">
+          <div class="slider-label-row" style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:4px;">
+            <label for="bg-blur-slider">Backdrop Blur Strength</label>
+            <span class="slider-val" id="bg-blur-val">20px</span>
+          </div>
+          <input type="range" id="bg-blur-slider" min="0" max="40" step="1" value="20" oninput="updateStudioSlidersLive()" style="width:100%;" />
+        </div>
+      </div>
+
+      <!-- Section: Sound Experience -->
+      <div class="studio-section" style="margin-bottom:24px;">
+        <div class="studio-section-label" style="font-size:12px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;border-bottom:1px solid var(--border);padding-bottom:4px;">🔊 Audio & Soundscapes</div>
+        
+        <div class="form-group" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <label for="sound-fx-toggle" style="font-size:12px;color:var(--text);">On-Device Interface Sounds</label>
+          <input type="checkbox" id="sound-fx-toggle" onchange="toggleStudioSoundFX()" style="width:16px;height:16px;" />
+        </div>
+        
+        <div class="form-group" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <label for="keyboard-fx-toggle" style="font-size:12px;color:var(--text);">Mechanical Keyboard Feedback</label>
+          <input type="checkbox" id="keyboard-fx-toggle" onchange="toggleStudioKeyboardFX()" style="width:16px;height:16px;" />
+        </div>
+        
+        <div class="form-group" style="margin-bottom:12px;">
+          <label for="keyboard-type-select" style="display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;">Switch Type Profile</label>
+          <select id="keyboard-type-select" onchange="updateStudioKeyboardType()" style="width:100%;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:13px;">
+            <option value="thock">Lubricated Linear (Thock)</option>
+            <option value="clicky">Cherry MX Blue (Clicky)</option>
+            <option value="pop">Silenced Tactile (Bubble Pop)</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom:12px;">
+          <label for="ambient-noise-select" style="display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;">Focus Background Noise</label>
+          <select id="ambient-noise-select" onchange="updateStudioAmbientNoise()" style="width:100%;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:13px;">
+            <option value="none">None</option>
+            <option value="brown">Synthetic Brown Noise</option>
+            <option value="white">Synthetic White Noise</option>
+            <option value="lofi">Generative Ambient Swells</option>
+            <option value="rain">Generative Forest Rain</option>
+          </select>
+        </div>
+        
+        <div class="form-group" style="margin-bottom:12px;">
+          <div class="slider-label-row" style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:4px;">
+            <label for="ambient-volume-slider">Background Volume</label>
+            <span class="slider-val" id="ambient-volume-val">50%</span>
+          </div>
+          <input type="range" id="ambient-volume-slider" min="0" max="1.0" step="0.05" value="0.5" oninput="updateStudioAmbientVolume()" style="width:100%;" />
+        </div>
+      </div>
+
+      <!-- Section: AI Assistant Personality -->
+      <div class="studio-section" style="margin-bottom:24px;">
+        <div class="studio-section-label" style="font-size:12px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;border-bottom:1px solid var(--border);padding-bottom:4px;">🤖 AI Assistant Configuration</div>
+        <div class="form-group" style="margin-bottom:12px;">
+          <label for="ai-persona-select" style="display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;">Persona & Tone</label>
+          <select id="ai-persona-select" onchange="updateStudioAiPersona()" style="width:100%;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:13px;">
+            <option value="mentor">Professor / Academic Mentor</option>
+            <option value="coach">Encouraging Study Coach</option>
+            <option value="friend">Casual Study Partner</option>
+            <option value="researcher">Fact-focused Research Assistant</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:12px;">
+          <label for="ai-provider-select" style="display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;">AI Model Provider</label>
+          <select id="ai-provider-select" onchange="updateStudioAiProvider()" style="width:100%;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:13px;">
+            <option value="gemini">Google Gemini (Default)</option>
+            <option value="claude">Anthropic Claude</option>
+          </select>
+        </div>
+        <div class="form-group" id="gemini-key-group" style="margin-bottom:12px;">
+          <label for="ai-key-input" style="display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;">Gemini API Key</label>
+          <input type="password" id="ai-key-input" placeholder="AIzaSy..." onchange="updateStudioApiKey()" style="width:100%;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:13px;box-sizing:border-box;" />
+          <p class="studio-section-desc" style="color:var(--muted);font-size:10px;margin:6px 0 0;">Get your free key at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline;">aistudio.google.com</a></p>
+        </div>
+        <div class="form-group" id="claude-key-group" style="margin-bottom:12px;display:none;">
+          <label for="claude-key-input" style="display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;">Claude API Key</label>
+          <input type="password" id="claude-key-input" placeholder="sk-ant-..." onchange="updateStudioClaudeKey()" style="width:100%;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:13px;box-sizing:border-box;" />
+          <p class="studio-section-desc" style="color:var(--muted);font-size:10px;margin:6px 0 0;">Get your key at <a href="https://console.anthropic.com/" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline;">console.anthropic.com</a>. *Requires PC Bridge for secure routing.*</p>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+  <!-- Bridge Settings Modal -->
+  <div class="modal-overlay" id="bridge-modal">
+    <div class="modal glass-card">
+      <h3>🔗 PC Bridge Settings</h3>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:16px;">Connect to your laptop's AURA Bridge server via local network.</p>
+      <div class="form-group">
+        <label>Laptop IP Address</label>
+        <input type="text" id="bridge-ip-input" placeholder="e.g. 192.168.1.5" />
+      </div>
+      <div class="form-group">
+        <label>Port (default: 8765)</label>
+        <input type="number" id="bridge-port-input" placeholder="8765" value="8765" />
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px;">
+        <button class="btn-secondary" onclick="closeBridgeModal()" style="flex:1;">Cancel</button>
+        <button class="btn-primary" onclick="saveBridgeSettings()" style="flex:1;">💾 Save & Connect</button>
+      </div>
+      <button class="btn-ghost" onclick="testBridgeConnection()" style="width:100%;margin-top:8px;">🔍 Test Connection</button>
+      <div id="bridge-test-result" style="margin-top:8px;font-size:13px;text-align:center;"></div>
+    </div>
+  </div>
+
+  <!-- Canvas Confetti Library for Gamification -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script>
+    // Fallback if offline
+    if (typeof confetti === 'undefined') {
+      window.confetti = function() { console.log('[Confetti] Fanfare triggered!'); };
+    }
+  </script>
+
+  <!-- PDF.js library for high-quality text extraction from PDFs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+  <!-- Scripts -->
+  <script src="particles.js?v=33"></script>
+  <script src="sounds.js?v=33"></script>
+  <script src="db.js?v=33"></script>
+  <script src="ai.js?v=33"></script>
+  <script src="bridge.js?v=33"></script>
+  <script src="app.js?v=33"></script>
+
+  <!-- Service Worker Registration & Cache Purge -->
+  <script>
+    const EXPECTED_VERSION = 'v33';
+    const currentVersion = localStorage.getItem('aura_app_version');
+
+    if (currentVersion !== EXPECTED_VERSION) {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            registration.unregister();
+            console.log('[SW] Unregistered old service worker');
+          }
+        });
+      }
+      if ('caches' in window) {
+        caches.keys().then(function(keys) {
+          keys.forEach(function(key) {
+            caches.delete(key);
+            console.log('[Cache] Purged old cache: ' + key);
+          });
+        });
+      }
+      localStorage.setItem('aura_app_version', EXPECTED_VERSION);
+      console.log('[App] New version detected, reloading...');
+      setTimeout(() => {
+        window.location.reload(true);
+      }, 300);
+    } else {
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('[SW] Registered successfully!', reg.scope))
+            .catch(err => console.log('[SW] Registration failed:', err));
+        });
+      }
+    }
+  </script>
+
+</body>
+</html>
