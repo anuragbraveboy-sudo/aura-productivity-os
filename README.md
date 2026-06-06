@@ -1,127 +1,118 @@
-# AURA — Privacy-First On-Device Academic Co-Pilot 🧠
+# AURA — Privacy-First On-Device Academic Co-Pilot & RPG 🧠
 
 > **iQOO Hackathon 2026 | AgentKit Track**
 > Built for the First Hybrid Mobile Architecture
-
-![AURA](https://img.shields.io/badge/AURA-Academic_Co--Pilot-00d4ff?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGNpcmNsZSBjeD0iMzIiIGN5PSIyOCIgcj0iMTIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwZDRmZiIgc3Ryb2tlLXdpZHRoPSIyIi8+PGNpcmNsZSBjeD0iMzIiIGN5PSIyOCIgcj0iMyIgZmlsbD0iIzAwZDRmZiIvPjwvc3ZnPg==)
-![Track](https://img.shields.io/badge/Track-AgentKit-ff4466?style=for-the-badge)
-![Phone First](https://img.shields.io/badge/Phone_First-iQOO-ffaa22?style=for-the-badge)
 
 ---
 
 ## 💡 What is AURA?
 
-AURA is a **free, offline AI study companion** that records your lectures, summarizes them, creates flashcards, and schedules your revision — all running locally on your phone with **zero internet** and **zero cost**.
+AURA is a **free, offline AI study companion** that records lectures, processes files, auto-generates summaries/flashcards, and schedules your revisions — all integrated with a gamified RPG leveling engine to boost your study streak.
 
 ### The Problem
-- 📡 **No Internet**: 68% of Indian classrooms have unreliable connectivity
-- 💸 **No Budget**: ChatGPT Plus costs ₹1,700/mo — unaffordable for students
-- 🔓 **No Privacy**: Cloud AI uploads your university notes to external servers
+- 📡 **Spotty Connectivity**: Classroom Wi-Fi is often slow or restricted.
+- 💸 **Subscription Cost**: Cloud AI co-pilots charge high monthly fees.
+- 🔓 **Data Privacy**: Students upload private study transcripts to external servers.
 
 ### The AURA Solution
-- 🎙️ **Record Lecture** → Live speech-to-text, all on-device
-- 📝 **AI Summary** → Instant lecture summaries via Gemini API
-- 🃏 **Flashcards** → Auto-generated Q&A cards with 3D flip animation
-- 📅 **Smart Calendar** → AI suggests optimal study times
-- 🔗 **Hybrid Bridge** → Sync heavy tasks to laptop via iQOO Office Kit
+- 🎙️ **Multi-mode Recorder** → Capture audio/video lectures offline with streaming Web Speech transcription.
+- 🎨 **AURA Studio** → Choose from 10 customizable particle visualizers (Constellations, Aurora, etc.) to set study ambiances.
+- 🍅 **Focus Hub** → Work using a glowing Pomodoro timer widget with a dynamic SVG progress ring.
+- 🧠 **RPG Leveling** → Earn XP for Pomodoro sessions (+100 XP), completing tasks (+50 XP), or solving AI Study Coach quizzes (+20 XP). Leveling up triggers visual fanfares and unlocks level-locked themes (Sakura Bloom, Cyberpunk).
+- 📅 **Notion Planner** → View deadlines and sessions in a month grid calendar with priority color indicators.
+- 💻 **iQOO Office Kit Bridge** → Offload PDF text chunking, local search indices, and Claude API proxying to your laptop local network to avoid browser security limits.
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Architecture Layout
 
 ```
 ┌─────────────────────────────────┐
 │       📱 iQOO Phone             │
 │                                 │
 │  🎙️ Speech-to-Text (on-device) │
-│  🧠 Gemini API (AI summaries)  │
-│  💾 IndexedDB (local storage)  │
-│  📱 PWA (works offline)        │
+│  🍅 SVG Pomodoro Timer Hub     │
+│  💾 IndexedDB (Local Stores)   │
+│  🎨 Canvas Particle engine      │
+│  🎵 Web Audio Synthesizer       │
+│  📱 Offline PWA Client          │
 └────────────┬────────────────────┘
              │ iQOO Office Kit Bridge
-             │ (Local network sync)
+             │ (Local network sync & proxies)
 ┌────────────┴────────────────────┐
 │       💻 Laptop Muscle          │
 │                                 │
-│  📚 PDF processing              │
-│  🔍 Document vectorization     │
-│  📤 Sync back to phone         │
+│  📚 PDF text chunking           │
+│  🔍 Keyword indexing            │
+│  📤 Sync back notes as files    │
+│  🔀 Claude CORS proxy router    │
 └─────────────────────────────────┘
 ```
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start Instructions
 
-### 1. Run the Phone App (PWA)
+### 1. Start the PWA App
 ```bash
 cd app
 python -m http.server 8080
 ```
-Open `http://localhost:8080` in Chrome. On phone, open `http://<laptop-ip>:8080`.
+Open **`http://localhost:8080`** in Chrome. To access on your phone, open **`http://<laptop-ip>:8080`**.
 
-### 2. Run the PC Bridge Server (Laptop)
+### 2. Start the PC Bridge Server (Laptop)
 ```bash
 cd pc-bridge
 python server.py
 ```
-The bridge server starts on port `8765`.
+The local bridge service will listen on port **`8765`**.
 
-### 3. Connect Phone → Laptop
-- In the app, tap the **Bridge Status Bar** at the top
-- Enter your laptop's IP address
-- Tap **Save & Connect**
-- Hit **Sync** on the home screen to transfer lectures
+### 3. Establish the Connection
+- Tap the **Bridge Status Badge** at the top right of the app.
+- Enter your laptop's local Wi-Fi IP address.
+- Click **Connect Laptop Bridge**. The badge will light up **green (Bridge Online)**!
 
 ---
 
-## 📁 Project Structure
-
+## 📁 Repository Structure
 ```
-aura-student-copilot/
-├── app/                    # PWA (runs on phone browser)
-│   ├── index.html          # Main app entry point
-│   ├── styles.css          # Dark theme, glassmorphism, animations
-│   ├── app.js              # Core logic (recording, navigation, etc.)
-│   ├── ai.js               # Gemini API integration + fallback
-│   ├── bridge.js           # iQOO Office Kit phone↔laptop sync
-│   ├── db.js               # IndexedDB local storage
-│   ├── sw.js               # Service worker (offline support)
-│   └── manifest.json       # PWA manifest
-├── pc-bridge/              # Laptop server (Python)
-│   └── server.py           # FastAPI-style bridge server
-├── docs/                   # Presentation & submission docs
-│   └── aura_architecture_presentation.pptx
+aura-productivity-os/
+├── app/                    # SPA Progressive Web App
+│   ├── index.html          # HTML Shell & testing IDs
+│   ├── styles.css          # Design system & visual themes
+│   ├── app.js              # Routing, timers, RPG leveler, & recorders
+│   ├── ai.js               # Gemini & Claude API manager
+│   ├── bridge.js           # Laptop proxy connector
+│   ├── db.js               # IndexedDB offline database
+│   ├── particles.js        # AURA Studio particle backgrounds
+│   ├── sounds.js           # Synthesized UI audio
+│   ├── sw.js               # Offline service worker cache
+│   └── manifest.json       # PWA declaration
+├── pc-bridge/              # Python service
+│   └── server.py           # Laptop HTTP sync server
 └── README.md
 ```
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Tech Stack Details
 
-| Layer | Technology | Purpose |
-|-------|-----------|---------|
-| **Frontend** | Vanilla JS + CSS | Zero-dependency PWA |
-| **Speech** | Web Speech API | Real-time voice-to-text |
-| **AI** | Gemini API | Summarization, flashcards, Q&A |
-| **Storage** | IndexedDB | Offline-first local database |
-| **Bridge** | HTTP + Local Network | Phone ↔ Laptop sync via iQOO Office Kit |
-| **Backend** | Python (stdlib) | PDF processing, document indexing |
-
----
-
-## 📊 Judging Alignment
-
-| Criteria | Weight | How AURA Addresses It |
-|----------|--------|----------------------|
-| iQOO Office Kit Usage | 25% | Bridge module with real-time sync, health monitoring |
-| Phone-First Execution | 25% | PWA feels native, works offline, mobile-optimized |
-| AI-Native Build | 20% | On-device STT + Gemini API for smart features |
-| Problem Fit | 20% | Every Indian student struggles with this |
-| Craft & Pitch | 10% | Premium dark UI, smooth animations, polished UX |
+| Component | Technical Implementation |
+|---|---|
+| **Frontend** | Vanilla JavaScript + Modern HTML5 / CSS Variables |
+| **Speech** | Web Speech API (`webkitSpeechRecognition`) for offline live transcription |
+| **Synthesizer** | Web Audio API Oscillator nodes for assets-free audio feedback |
+| **Backgrounds** | 2D HTML5 Canvas rendering engine with 60 FPS animation loops |
+| **Storage** | IndexedDB local object stores (`lectures`, `flashcards`, `deadlines`, `settings`) |
+| **Bridge** | HTTP endpoints mapping sync & proxy calls over local Wi-Fi |
+| **Backend** | Zero-dependency Python 3 standard library server |
 
 ---
 
-## 📄 License
+## 📊 iQOO Hackathon Judgement Alignment
 
-MIT License — Built for iQOO Hackathon 2026
+- **iQOO Office Kit Bridge (25%)**: Dual device integration offloads heavy processing to laptop, syncs data, and proxies API requests.
+- **Phone-First Execution (25%)**: Lightweight PWA design optimized for mobile dimensions, fully offline functional.
+- **AI-Native Build (20%)**: Leverages Gemini and Claude models with smart context injections for summaries, flashcard generators, and interactive quiz bots.
+- **Problem Fit (20%)**: Resolves classroom connectivity constraints and cloud service expenses for students.
+- **Craft & Pitch (10%)**: Premium animations, 5 fluid themes, synthesized sounds, and constellation visualizers.

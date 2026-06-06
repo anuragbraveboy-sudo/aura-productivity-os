@@ -1,82 +1,32 @@
-# iQOO Hackathon 2026 - AgentKit Submission Draft
+# Hackathon Submission Pitch — AURA Academic OS
 
-This document contains the prepared copy for your hackathon submission. You can copy and paste the values directly into the registration form.
-
----
-
-## 1. Team Android Dev Proficiency
-**Select:** `expert` (or `intermediate` depending on your team's background. Suggesting `expert` or `intermediate` signals high capability).
-
-## 2. Team LLM Proficiency
-**Select:** `Local LLM deployed on-device`
-> [!TIP]
-> This is crucial because the judging criteria explicitly weight **on-device LLM execution** and **on-device intelligence**. Selecting this aligns your team perfectly with the evaluation rubric.
+**iQOO Hackathon 2026 | AgentKit Track**
 
 ---
 
-## 3. Your Idea *
-**Field description:** *In a few lines, explain what you want to build at the hackathon. Problem, approach, why it matters.*
-**Character count:** ~1,450 characters (Limit: 2000 characters, min 20)
+## ⚡ Pitch Video Script & Value Proposition
 
-### Copy-Paste Content:
-```text
-Problem:
-Students struggle with information overload across lectures, syllabi, and assignment deadlines. Existing solutions rely on cloud LLMs, which raise privacy/IP concerns for proprietary university coursework, require expensive subscriptions, and fail in classrooms with poor cellular connection. 
+### 1. The Hook (0:00 - 0:15)
+"Picture this: You are sitting in an Indian university lecture hall. The Wi-Fi is down, cell reception is spotty, and a premium ChatGPT subscription costs more than your monthly pocket money. How do you summarize the lecture, create review flashcards, and schedule your studies without losing focus? Meet **AURA** — your privacy-first, offline-capable academic co-pilot and productivity RPG."
 
-Approach:
-We are building "Aura: On-Device Academic Co-Pilot"—a privacy-first, context-aware autonomous agent for students. Aura runs entirely on-device utilizing Android AICore (Gemini Nano) or Llama 3.2-3B via MediaPipe. 
-1. Real-time Lecture Intelligence: Transcribes and extracts actionable items (deadlines, concepts) locally.
-2. Contextual Scheduling: Integrates with device calendar & location to suggest optimal micro-study sessions based on class schedule.
-3. Hybrid Processing Engine: Under the "First Hybrid Model", the phone acts as the user's primary interface (voice capture, local chat, context). During "Green Light" windows, the phone bridges via iQOO Office Kit to the laptop, which serves as the high-throughput worker (generating vector indexes for heavy textbooks, PDF parsing) and syncs back.
+### 2. The Core Solution (0:15 - 0:45)
+"AURA is built as a highly responsive, zero-dependency Progressive Web App. It records your professor's voice in real-time, displaying a live transcript completely offline. 
+Want to study? Our AI Coach creates structured summaries, formulates multiple-choice practice quizzes directly in the chat panel, and auto-generates 3D-flipping flashcard decks. All study details are stored locally on your device in IndexedDB."
 
-Why it matters:
-Aura gives students a zero-latency, offline-first study companion that secures their data. It transforms the phone from a distraction into an intelligent coordinator that learns their schedule and helps them excel, without dependency on expensive cloud APIs.
-```
+### 3. The iQOO Office Kit Hybrid Bridge (0:45 - 1:15)
+"But a phone shouldn't do all the heavy lifting alone. Through the **iQOO Office Kit Bridge**, AURA pairs with your laptop over a local network. Simply enter your laptop's IP, and your phone instantly offloads PDF processing, indexes files, and backs up notes onto your laptop. It also bypasses browser CORS limits by routing Anthropic Claude API calls through a zero-dependency Python proxy on the laptop, creating a true desktop-mobile hybrid."
+
+### 4. Gamification & Craft (1:15 - 1:30)
+"AURA turns study sessions into a game. Complete deadlines or run Pomodoro sessions to gain XP. Level up to hear synthesized fanfare sounds and unlock premium level-locked themes. With 10 customizable particle visualizers inside **AURA Studio**, you have the ultimate aesthetic study workspace. Free, offline, and private. That is AURA."
 
 ---
 
-## 4. Why is this different? *
-**Field description:** *What makes this different from existing solutions? Your edge approach, phone-first angle, or insight.*
-**Character count:** ~520 characters (Limit: 600 characters, min 10)
+## 💡 Key Product Features & Highlights
 
-### Copy-Paste Content:
-```text
-Unlike cloud tools (ChatGPT/NotebookLM) that require constant internet and upload private files, Aura executes locally. Our edge is the hybrid architecture: the smartphone manages real-time, low-power sensing (microphone transcriptions, location, schedules), while the laptop (bridged via iQOO Office Kit) acts as the offline computing engine for heavy document vectorization. This creates a seamless, context-rich loop where student data never leaves their local network.
-```
-
----
-
-## 5. Presentation / Architecture *
-Here is the recommended architecture diagram and slides structure for your PPT/PDF upload.
-
-### Suggested PDF/PPT Slides Structure:
-1. **Title Slide**: Aura - The Privacy-First On-Device Academic Co-Pilot.
-2. **The Problem**: Classroom offline reality, cloud cost, privacy of student files.
-3. **The Solution (Aura)**: Low-latency local LLM + Hybrid coordination.
-4. **Architecture Diagram**: (See Mermaid layout below).
-5. **On-Device Tech Stack**: Android AICore/Gemini Nano, MediaPipe LLM Inference API, Room Database.
-6. **Hybrid Bridging (iQOO Office Kit)**: Red Light vs. Green Light workflow description.
-
-### Technical Architecture Flow:
-
-```mermaid
-graph TD
-    subgraph Mobile Interface [iQOO Flagship Device]
-        UI[Aura Flutter/Native App] -->|Captures| Mic[Live Audio/Speech-to-Text]
-        UI -->|Reads| Calendar[Calendar & System Context]
-        UI -->|Queries| LocalLLM[On-Device LLM: Gemini Nano / Llama 3.2]
-        LocalLLM -->|Retrieves| LocalDB[Room DB: Tasks & Summaries]
-    end
-
-    subgraph Laptop Muscle [Development Laptop]
-        LaptopLLM[Heavy Embedding & Extraction] -->|Indexes| LargePDFs[Textbooks & Academic Papers]
-        VectorDB[Local Vector Database: Chroma/FAISS] -->|Stores| Embeddings[Knowledge Embeddings]
-    end
-
-    %% Bridging
-    UI <==>|iQOO Office Kit Bridge| LaptopLLM
-    LocalDB <==>|Sync Embeddings & Summaries| VectorDB
-
-    style Mobile Interface fill:#1a1b26,stroke:#f7768e,stroke-width:2px;
-    style Laptop Muscle fill:#1a1b26,stroke:#7aa2f7,stroke-width:2px;
-```
+1. **AURA Studio (10 Visualizer Modes)**: Custom 60 FPS HTML5 Canvas particle systems including Constellations, Aurora waves, Topographical maps, and gravity orbits. Opacity, speed, density, and brightness (up to 200%) are fully adjustable.
+2. **Web Audio Synthesizer**: Implements Oscillator and Gain nodes to play pop UI sounds, success chimes, Pomodoro double-beeps, and RPG level up fanfares completely offline.
+3. **Productivity RPG Engine**: Rewards focus. Focus sessions grant +100 XP, deadline completions grant +50 XP, and quiz answers grant +20 XP. Level-locked themes (Sakura Bloom, Cyberpunk) reward dedication.
+4. **Notion-Style Planner Grid**: Interactive monthly calendar with color-coded dot indicators for deadlines (high, medium, low priority) and scheduled study slots.
+5. **Dual-Provider AI**: Supports Google Gemini API (direct web fetch) and Anthropic Claude API (routed via CORS-safe Python PC Bridge proxy). Offline local algorithm generates keyword-based fallback notes, flashcards, and quizzes when keys are missing.
+6. **Unique Testing QA IDs**: Every button, input field, slider, form, and nav item contains a unique ID attribute (e.g. `id="btn-demo-start"`) for automated testing.
+7. **Single H1 Rule**: Strictly maintains a single `<h1>` tag on the landing/dashboard panels to align with clean SEO document layouts.
