@@ -3,6 +3,29 @@
    Notion Calendar, Audio/Video Recorder, and Hackathon Seeding.
    ========================================================================== */
 
+// Resilient Storage Guard: Polyfill localStorage if blocked by security policies
+(() => {
+  try {
+    localStorage.getItem('__test__');
+  } catch (e) {
+    console.warn("localStorage is blocked by browser policies. Using in-memory fallback.");
+    const store = {};
+    const mockStorage = {
+      getItem(key) { return store[key] || null; },
+      setItem(key, val) { store[key] = String(val); },
+      removeItem(key) { delete store[key]; },
+      clear() { for (const k in store) delete store[k]; },
+      key(i) { return Object.keys(store)[i] || null; },
+      get length() { return Object.keys(store).length; }
+    };
+    Object.defineProperty(window, 'localStorage', {
+      value: mockStorage,
+      writable: true,
+      configurable: true
+    });
+  }
+})();
+
 const AuraApp = (() => {
   // Application State
   const state = {
