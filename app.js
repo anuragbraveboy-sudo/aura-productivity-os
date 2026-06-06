@@ -654,6 +654,12 @@ An overview of the **mitosis cell cycle** phase transitions in biological divisi
     const videoEl = document.getElementById('video-recording-preview');
     if (!videoEl) return;
 
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      showToast("⚠️ HTTPS or chrome://flags setup required for Camera/Mic access.");
+      console.warn("navigator.mediaDevices is undefined on insecure HTTP origins.");
+      return;
+    }
+
     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
       .then(stream => {
         videoEl.srcObject = stream;
@@ -769,6 +775,10 @@ An overview of the **mitosis cell cycle** phase transitions in biological divisi
 
       // B: Initialize MediaRecorder if in video mode
       if (state.recording.mode === 'video') {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          showToast("⚠️ HTTPS or chrome://flags setup required for Video recording.");
+          return;
+        }
         navigator.mediaDevices.getUserMedia({ video: true, audio: true })
           .then(stream => {
             state.recording.mediaRecorder = new MediaRecorder(stream);
@@ -778,6 +788,10 @@ An overview of the **mitosis cell cycle** phase transitions in biological divisi
               }
             };
             state.recording.mediaRecorder.start(1000);
+          })
+          .catch(err => {
+            console.error("Failed to start video recording: ", err);
+            showToast("Failed to start video recording.");
           });
       }
     }
