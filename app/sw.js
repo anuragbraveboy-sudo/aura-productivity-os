@@ -1,63 +1,67 @@
-const CACHE_NAME = 'aura-v2';
+const CACHE_NAME = 'aura-v2.0.33';
 const ASSETS = [
-  'index.html',
-  'styles.css',
-  'app.js',
-  'ai.js',
-  'bridge.js',
-  'db.js',
-  'particles.js',
-  'sounds.js',
-  'manifest.json'
+  './',
+  './index.html',
+  './styles.css',
+  './app.js',
+  './ai.js',
+  './bridge.js',
+  './db.js',
+  './particles.js',
+  './sounds.js',
+  './manifest.json'
 ];
 
+// Install — pre-cache all core assets
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
+      console.log('[SW] Pre-caching app shell');
       return cache.addAll(ASSETS);
     })
   );
   self.skipWaiting();
 });
 
+// Activate — clean old caches
 self.addEventListener('activate', (e) => {
   e.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
-        })
-      );
-    })
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))
+      )
+    )
   );
   self.clients.claim();
 });
 
+// Fetch — network-first during development, cache as fallback
 self.addEventListener('fetch', (e) => {
-  // Only handle GET requests and local files
-  if (e.request.method !== 'GET' || !e.request.url.startsWith(self.location.origin)) {
-    return;
-  }
+  const url = new URL(e.request.url);
+
+  // Skip non-GET and external API calls
+  if (e.request.method !== 'GET') return;
+  if (url.origin !== self.location.origin) return;
+
   e.respondWith(
-    caches.match(e.request).then((cachedResponse) => {
-      if (cachedResponse) return cachedResponse;
-      return fetch(e.request).then((networkResponse) => {
-        if (!networkResponse || networkResponse.status !== 200) {
-          return networkResponse;
+    fetch(e.request)
+      .then((response) => {
+        // Update cache with fresh response
+        if (response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
         }
-        const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(e.request, responseToCache);
+        return response;
+      })
+      .catch(() => {
+        // Fallback to cache when offline
+        return caches.match(e.request).then((cached) => {
+          if (cached) return cached;
+          if (e.request.mode === 'navigate') {
+            return caches.match('./index.html');
+          }
+          return new Response('Offline', { status: 503 });
         });
-        return networkResponse;
-      }).catch(() => {
-        // Fallback for offline mode if request is html
-        if (e.request.headers.get('accept').includes('text/html')) {
-          return caches.match('index.html');
-        }
-      });
-    })
+      })
   );
 });

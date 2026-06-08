@@ -1,18 +1,13 @@
-/* ==========================================================================
-   AURA Audio Engine — Web Audio API Synthesizer (Zero-Assets Offline SFX & Ambient)
-   ========================================================================== */
+/* ═══════════════════════════════════════════════
+   AURA  —  Synthesized Sound System (sounds.js)
+   Pure Web Audio API chimes, tap clicks, keyboard thocks & ambient soundscapes
+   ═══════════════════════════════════════════════ */
 
 class AuraSounds {
   constructor() {
     this.ctx = null;
-    let localMuted = false;
-    let localKb = false;
-    try {
-      localMuted = localStorage.getItem('aura_muted') === 'true';
-      localKb = localStorage.getItem('aura_keyboard_fx') === 'true';
-    } catch(e) {}
-    this.muted = localMuted;
-    this.keyboardFXEnabled = localKb;
+    this.muted = localStorage.getItem('aura_muted') === 'true';
+    this.keyboardFXEnabled = localStorage.getItem('aura_keyboard_fx') === 'true';
     
     this.ambientSource = null;
     this.ambientGain = null;
@@ -23,7 +18,7 @@ class AuraSounds {
     const unlock = () => {
       this.initContext();
       if (this.ctx && this.ctx.state === 'suspended') {
-        try { this.ctx.resume(); } catch(e) {}
+        this.ctx.resume();
       }
       window.removeEventListener('click', unlock);
       window.removeEventListener('touchstart', unlock);
@@ -31,12 +26,10 @@ class AuraSounds {
     window.addEventListener('click', unlock);
     window.addEventListener('touchstart', unlock);
 
-    // Auto boot ambient noise if set
-    let savedAmbient = 'none';
-    try {
-      savedAmbient = localStorage.getItem('aura_ambient_noise') || 'none';
-    } catch(e) {}
+    // Initial load of ambient sounds
+    const savedAmbient = localStorage.getItem('aura_ambient_noise') || 'none';
     if (savedAmbient !== 'none') {
+      // Will play once user interacts
       window.addEventListener('click', () => {
         if (!this.ambientSource) {
           this.initAmbientSource(savedAmbient);
@@ -52,13 +45,6 @@ class AuraSounds {
     }
   }
 
-  // Aliases for compatibility with app.js calls
-  click() { this.playTap(); }
-  success() { this.playSuccess(); }
-  pomo() { this.playPomodoroComplete(); }
-  levelup() { this.playLevelUp(); }
-
-  // Play interface tap sound
   playTap() {
     if (this.muted) return;
     this.initContext();
@@ -70,6 +56,7 @@ class AuraSounds {
     osc.connect(gain);
     gain.connect(this.ctx.destination);
     
+    // Extremely short popping sound
     osc.type = 'sine';
     osc.frequency.setValueAtTime(1200, this.ctx.currentTime);
     osc.frequency.exponentialRampToValueAtTime(150, this.ctx.currentTime + 0.04);
@@ -81,20 +68,16 @@ class AuraSounds {
     osc.stop(this.ctx.currentTime + 0.04);
   }
 
-  // Play mechanical keyboard keystroke feedback
   playKeystroke() {
     if (this.muted || !this.keyboardFXEnabled) return;
     this.initContext();
     if (!this.ctx) return;
 
-    let type = 'thock';
-    try {
-      type = localStorage.getItem('aura_keyboard_type') || 'thock';
-    } catch(e) {}
+    const type = localStorage.getItem('aura_keyboard_type') || 'thock';
     const now = this.ctx.currentTime;
     
     if (type === 'thock') {
-      // Lubed Linear: deep low-pass filtered triangle
+      // Lubed Linear Thock: Deep, soft lowpass filtered triangle
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       const filter = this.ctx.createBiquadFilter();
@@ -115,8 +98,8 @@ class AuraSounds {
       
       osc.start(now);
       osc.stop(now + 0.09);
-    } else if (type === 'clicky') {
-      // Clicky: Cherry MX Blue style high frequency beep + pop
+    } else if (type === 'click') {
+      // Cherry MX Blue Clicky: Short high click + base pop
       const osc1 = this.ctx.createOscillator();
       const osc2 = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
@@ -139,7 +122,7 @@ class AuraSounds {
       osc1.stop(now + 0.03);
       osc2.stop(now + 0.03);
     } else if (type === 'pop') {
-      // Bubble pop: Silent tactile style
+      // Silenced Tactile Bubble Pop: Drop frequency arpeggio
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       
@@ -158,7 +141,6 @@ class AuraSounds {
     }
   }
 
-  // Synthesize Noise Buffers
   createBrownNoiseBuffer() {
     const bufferSize = 2 * this.ctx.sampleRate;
     const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
@@ -168,7 +150,7 @@ class AuraSounds {
       const white = Math.random() * 2 - 1;
       data[i] = (lastOut + (0.02 * white)) / 1.02;
       lastOut = data[i];
-      data[i] *= 3.5; // Gain scaling
+      data[i] *= 3.5; // Compensate volume
     }
     return buffer;
   }
@@ -183,7 +165,6 @@ class AuraSounds {
     return buffer;
   }
 
-  // Play ambient sound loops
   initAmbientSource(type) {
     this.stopAmbient();
     this.initContext();
@@ -192,10 +173,7 @@ class AuraSounds {
     this.ambientGain = this.ctx.createGain();
     this.ambientGain.connect(this.ctx.destination);
     
-    let vol = 0.5;
-    try {
-      vol = parseFloat(localStorage.getItem('aura_ambient_volume') || '0.5');
-    } catch(e) {}
+    const vol = parseFloat(localStorage.getItem('aura_ambient_volume') || '0.5');
     this.ambientGain.gain.setValueAtTime(vol * 0.15, this.ctx.currentTime);
     
     if (type === 'brown' || type === 'white') {
@@ -206,7 +184,7 @@ class AuraSounds {
       this.ambientSource.connect(this.ambientGain);
       this.ambientSource.start(0);
     } else if (type === 'rain') {
-      // Lowpass filtered white noise for mist + random high rain drops
+      // Background mist noise (white noise low-pass filtered)
       const buffer = this.createWhiteNoiseBuffer();
       this.ambientSource = this.ctx.createBufferSource();
       this.ambientSource.buffer = buffer;
@@ -220,6 +198,7 @@ class AuraSounds {
       filter.connect(this.ambientGain);
       this.ambientSource.start(0);
       
+      // Dynamic random drops
       this.rainInterval = setInterval(() => {
         if (this.muted) return;
         const osc = this.ctx.createOscillator();
@@ -238,8 +217,8 @@ class AuraSounds {
         osc.stop(this.ctx.currentTime + 0.05);
       }, 80);
     } else if (type === 'lofi') {
-      // Swelling lofi chord sweeps
-      const lofiNotes = [130.81, 164.81, 196.00, 261.63, 329.63, 392.00, 523.25];
+      // Generative lofi chord sweeps
+      const lofiNotes = [130.81, 164.81, 196.00, 261.63, 329.63, 392.00, 523.25]; // C chord tones
       this.lofiInterval = setInterval(() => {
         if (this.muted) return;
         const osc = this.ctx.createOscillator();
@@ -252,8 +231,8 @@ class AuraSounds {
         osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
         
         swellGain.gain.setValueAtTime(0, this.ctx.currentTime);
-        swellGain.gain.linearRampToValueAtTime(0.04, this.ctx.currentTime + 2.2);
-        swellGain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 6.0);
+        swellGain.gain.linearRampToValueAtTime(0.04, this.ctx.currentTime + 2.2); // attack
+        swellGain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 6.0); // release
         
         osc.start();
         osc.stop(this.ctx.currentTime + 6.1);
@@ -277,21 +256,19 @@ class AuraSounds {
   }
 
   setAmbientVolume(vol) {
-    try {
-      localStorage.setItem('aura_ambient_volume', vol);
-    } catch(e) {}
+    localStorage.setItem('aura_ambient_volume', vol);
     if (this.ambientGain) {
       this.ambientGain.gain.setValueAtTime(vol * 0.15, this.ctx.currentTime);
     }
   }
 
-  // Success bells
   playSuccess() {
     if (this.muted) return;
     this.initContext();
     if (!this.ctx) return;
 
-    const notes = [523.25, 659.25, 783.99]; // C5 -> E5 -> G5
+    // Upward arpeggio: C5 -> E5 -> G5
+    const notes = [523.25, 659.25, 783.99]; 
     const now = this.ctx.currentTime;
 
     notes.forEach((freq, idx) => {
@@ -313,13 +290,14 @@ class AuraSounds {
     });
   }
 
-  // Focus Complete Ring
   playPomodoroComplete() {
     if (this.muted) return;
     this.initContext();
     if (!this.ctx) return;
 
+    // Pleasant double chime alert (G5 -> C6)
     const now = this.ctx.currentTime;
+    
     const playChime = (freq, time, len) => {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
@@ -338,16 +316,16 @@ class AuraSounds {
       osc.stop(time + len + 0.05);
     };
 
-    playChime(783.99, now, 0.4);
-    playChime(1046.50, now + 0.22, 0.6);
+    playChime(783.99, now, 0.4);      // G5
+    playChime(1046.50, now + 0.22, 0.6); // C6
   }
 
-  // Level up fanfare
   playLevelUp() {
     if (this.muted) return;
     this.initContext();
     if (!this.ctx) return;
 
+    // Fanfare: C4 -> E4 -> G4 -> C5 -> E5 -> G5 -> C6
     const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
     const now = this.ctx.currentTime;
 
@@ -372,33 +350,23 @@ class AuraSounds {
 
   toggleMute() {
     this.muted = !this.muted;
-    try {
-      localStorage.setItem('aura_muted', this.muted);
-    } catch(e) {}
+    localStorage.setItem('aura_muted', this.muted);
     return this.muted;
   }
 }
 
-// Global Audio Engine Instantiation (Resilient Fallback)
-try {
-  window.AuraSounds = new AuraSounds();
-} catch (e) {
-  console.warn("Audio Context or LocalStorage blocked. Running silent fallback:", e);
-  window.AuraSounds = {
-    playTap() {}, playKeystroke() {}, playSuccess() {}, playPomodoroComplete() {}, playLevelUp() {},
-    click() {}, success() {}, pomo() {}, levelup() {},
-    toggleMute() { return true; }, stopAmbient() {}, setAmbientVolume() {}, initAmbientSource() {}
-  };
-}
+// Global sounds instance
+window.AuraSounds = new AuraSounds();
 
-// Dynamic sound interceptors
+// Intercept click events to play subtle tap sound
 document.addEventListener('click', (e) => {
-  const target = e.target.closest('button, .nav-bar-item, .pomo-mode-btn, .theme-option, .calendar-cell, .flashcard-container-3d, .detail-tab-pill');
+  const target = e.target.closest('button, .nav-item, .quick-action-btn, .theme-circle, .cal-day, .flashcard, .study-tab, .detail-back, .clear-chat-btn, .studio-theme-card');
   if (target) {
     window.AuraSounds.playTap();
   }
 });
 
+// Intercept keyboard typing to play mechanical thocks
 document.addEventListener('keydown', (e) => {
   const isInput = e.target.closest('input, textarea, [contenteditable="true"]');
   if (isInput) {
